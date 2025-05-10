@@ -73,7 +73,7 @@
 
 	table td {
 		padding: 3px;
-		cursor: hand;
+		cursor: pointer;
 	}
 
 	.selected {
@@ -109,9 +109,7 @@
 	tr:nth-child(even) {background-color: #f2f2f2;}
 	tr:hover {background-color: #ddffdd;}
 
-	@media (max-width: 500px) 
- 
-		{
+	@media (max-width: 500px) {
 		html {
 			font: 10px arial, sans-serif;
 		}
@@ -129,14 +127,13 @@
 		}
 
 		table td {
-			cursor: hand;
+			cursor: pointer;
 			font-size: 0.8em;
 		}
 
 		button {
 			font-size: 1.6em;
 		}
-		
 	}
 
 
@@ -154,8 +151,8 @@
 
 <div id="options">
 	<button class="raceButton everyone" onClick="updateMutableState({...state, r: '', p: ''})">Everyone</button>
-	<!-- <button class="raceButton race144M" onClick="updateMutableState({...state, r: '144M', p: ''})">144M</button> -->
-	<!-- <button class="raceButton race144F" onClick="updateMutableState({...state, r: '144F', p: ''})">144F</button> -->
+	<button class="raceButton race144M" onClick="updateMutableState({...state, r: '144M', p: ''})">144M</button>
+	<button class="raceButton race144F" onClick="updateMutableState({...state, r: '144F', p: ''})">144F</button>
 	<button class="raceButton race72M" onClick="updateMutableState({...state, r: '72M', p: ''})">72M</button>
 	<button class="raceButton race72F" onClick="updateMutableState({...state, r: '72F', p: ''})">72F</button>
 	<button class="raceButton race48M" onClick="updateMutableState({...state, r: '48M', p: ''})">48M</button>
@@ -420,17 +417,21 @@ const render = (data, domElement, func) => {
     document.getElementById("lastupdate").replaceChildren( "Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'))
 }
 
+
 const checkVersion = () => {
-	return new Promise ((resolve, reject) => {
-		fetch('./version.json?forceCache=' + new Date().getTime(), {
-			method: 'GET',
-				headers: myHeaders,
-			})
-			.then(function(response) {
-				return resolve(response.json());
-			})
-		})
-	}
+  return new Promise((resolve, reject) => {
+    fetch('./version.json?forceCache=' + new Date().getTime(), {
+      method: 'GET',
+      headers: myHeaders,
+    })
+    .then(response => resolve(response.json())) // ← this line
+    .catch(err => {
+      console.error("Version check failed:", err);
+      resolve(null);
+    });
+  });
+}
+
 
 const updateData = () => {
 	console.log("Updating at", new Date());
