@@ -1,0 +1,49 @@
+name: Deploy liveatthefair
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  S3_BUCKET: liveatthefair.com
+  CLOUDFRONT_DISTRO_ID: ${{ secrets.CLOUDFRONT_DISTRO_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get commit timestamp as version
+        id: version
+        run: |
+          VERSION=$(git show -s --format=%cd --date=format:'%Y.%m.%d-%H%M' $GITHUB_SHA)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Inject version into version.json and index.html
+        run: |
+          sed -i'' "s/__VERSION__/${VERSION}/g" index.html
+          sed -i'' "s/__VERSION__/${VERSION}/g" version.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: us-east-1
+
+      - name: Sync to S3
+        run: |
+          aws s3 sync . s3://$S3_BUCKET \
+            --exclude "*" \
+            --include "index.html" \
+            --include "version.json"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_DISTRO_ID \
+            --paths "/index.html" "/version.json"
