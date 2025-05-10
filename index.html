@@ -1,0 +1,514 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-131003474-2"></script>
+<script>
+	// Config
+	const raceStart = new Date('Mon May 12 2025 09:00:00 GMT-0400');
+	const version = "2025.5.09";
+	const lifeTimeEnabled = true;
+
+	// Global mutable state: displayFunction && sortFunction
+	let displayFunction = () => {}
+	let sortFunction = () => {}
+
+	// Management of above
+	let state = {}
+
+	// Lifetime miles, loaded once at startup
+	let lifetime = {}
+
+	const updateMutableState = (s, nopush) => {
+		if (state != s) {
+			state = s;
+
+			if (!nopush) {
+				var url = new URL(window.location);
+				url.hash = `${state.r || ""}|${state.s || ""}|${state.p || ""}`
+				Array('r', 's', 'p').forEach(x => url.searchParams.set(x, state[x] || ""))
+				window.history.pushState({}, "", url);
+			}
+
+			if (state.p) {
+				try {
+					const r = JSON.parse(decodeURIComponent(state.p))
+					specificRunner(r)
+				} catch(e) {
+					console.error ("unable to parse runner: " + state)
+				}
+			} else {
+				if (state.r) {
+					specificRace(state.r)
+				} else {
+					everyone()
+				}
+				updateSort(state.s)
+			}
+
+			loop()
+		}
+	}
+
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-131003474-2');
+</script>
+<style>
+
+	.yellow {
+		background-color: #FFFFC0 !important;
+	}
+
+	html {
+	    font: 12px arial, sans-serif;
+	}
+
+	#header {
+		font-size: x-large;
+	}
+
+	table td {
+		padding: 3px;
+		cursor: hand;
+	}
+
+	.selected {
+		color: #FFFFFF;
+		background-color: #A0A0A0;
+	}
+
+	.alert {
+		color: #FFFFFF;
+		size: 2em;
+		background-color: #800000;
+		font-weight: bold;
+		text-align: center;
+		padding: 10px;
+	}
+
+	.alert a {
+		color: #FFFFFF
+	}
+
+	.no-show {
+		display: none;
+	}
+
+	.mobile-only {
+		display: none;
+	}
+	
+	.supersize {
+		font-size: 3em !important;
+	}
+
+	tr:nth-child(even) {background-color: #f2f2f2;}
+	tr:hover {background-color: #ddffdd;}
+
+	@media (max-width: 500px) 
+ 
+		{
+		html {
+			font: 10px arial, sans-serif;
+		}
+
+		.desktop-only {
+			display: none;
+		}
+
+		table {
+			width: 100%;
+		}
+
+		table th {
+			font-size: 0.8em;
+		}
+
+		table td {
+			cursor: hand;
+			font-size: 0.8em;
+		}
+
+		button {
+			font-size: 1.6em;
+		}
+		
+	}
+
+
+</style>
+</head>
+<body>
+
+	<div id="versionNotification" class="no-show alert"></div>
+	<!-- <div id="header">NJ OneDay Live Tracking</div> -->
+	<div id="header">Three Days at the Fair <span class="desktop-only">Live</span> Tracking</div>
+
+<hr />
+<div id="lastupdate"></div>
+<div class="subheader">Results are automatically updated every minute</div>
+
+<div id="options">
+	<button class="raceButton everyone" onClick="updateMutableState({...state, r: '', p: ''})">Everyone</button>
+	<!-- <button class="raceButton race144M" onClick="updateMutableState({...state, r: '144M', p: ''})">144M</button> -->
+	<!-- <button class="raceButton race144F" onClick="updateMutableState({...state, r: '144F', p: ''})">144F</button> -->
+	<button class="raceButton race72M" onClick="updateMutableState({...state, r: '72M', p: ''})">72M</button>
+	<button class="raceButton race72F" onClick="updateMutableState({...state, r: '72F', p: ''})">72F</button>
+	<button class="raceButton race48M" onClick="updateMutableState({...state, r: '48M', p: ''})">48M</button>
+	<button class="raceButton race48F" onClick="updateMutableState({...state, r: '48F', p: ''})">48F</button>
+	<button class="raceButton race24M" onClick="updateMutableState({...state, r: '24M', p: ''})">24M</button>
+	<button class="raceButton race24F" onClick="updateMutableState({...state, r: '24F', p: ''})">24F</button>
+	<button class="raceButton race12M" onClick="updateMutableState({...state, r: '12M', p: ''})">12M</button>
+	<button class="raceButton race12F" onClick="updateMutableState({...state, r: '12F', p: ''})">12F</button>
+	<button class="raceButton race6M" onClick="updateMutableState({...state, r: '6M', p: ''})">6M</button>
+	<button class="raceButton race6F" onClick="updateMutableState({...state, r: '6F', p: ''})">6F</button>
+	<button class="raceButton raceQuadzilla" onClick="updateMutableState({...state, r: 'Quadzilla', p: ''})">Quadzilla</button>
+	<button class="raceButton race50K" onClick="updateMutableState({...state, r: '50K', p: ''})">50K</button>
+	<button class="raceButton raceMara" onClick="updateMutableState({...state, r: 'Mara', p: ''})">Marathon</button>
+</div>
+<div id="sortOptions">
+	Sort By:
+	<button class="sortButton name" onClick="updateMutableState({...state, s: ''})">Name</button>
+	<button class="sortButton score" onClick="updateMutableState({...state, s: 'score'})">Score</button>
+	<button class="sortButton lastPassing" onClick="updateMutableState({...state, s: 'lastPassing'})">Last Passing</button>
+	<button class="sortButton lifetime desktop-only" onClick="updateMutableState({...state, s: 'lifetime'})">Lifetime</button>
+	<div>Tip: Click on a runner's name for their details!</div>
+</div>
+<div class="desktop-only"><span class="yellow">Yellow background</span> indicates runner has run every year in The Fair's history</div>
+
+<div id="resultsDiv"></div>
+
+<script>
+
+// global utility functions
+const element = (tag, content, desktopOnly) => {
+	const x = document.createElement(tag)
+	x.append(document.createTextNode(content))
+	if (desktopOnly) x.classList.add("desktop-only")
+	return x
+}
+
+const groupBy = function(xs, key) {
+  return xs.reduce(function(rv, x) {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
+
+const totaltimeofday = (totaltime) => {
+	const millis = timeToMillis(totaltime)
+	const calculatedresult = raceStart.getTime() + millis
+	return new Date(calculatedresult)
+}
+
+const timeSinceStart = (avgTime, laps) => {
+	return (timeToMillis(avgTime) * laps)
+}
+
+const timeToMillis = (aTime) => {
+	const times = aTime.split(":");
+	const hours = times.length > 2 ? times[0] : 0;
+	const mins = times.length > 1 ? times[times.length-2] : 0;
+	const secs = times[times.length-1];
+	return ((hours*60*60*1000) + (mins*60*1000) + (secs*1000))
+}
+
+const appendThOrSt = (numberString) => {
+	const n = String(numberString || 0)
+	const last = n.charAt(n.length-1)
+	const penultimate = n.length>1?n.charAt(n.length - 2):0
+	if (penultimate == 1) {
+		return `${n}th`
+	} else  {
+		return `${n}${last=="3"?"rd":last=="2"?"nd":last==1?"st":"th"}`
+	}
+}
+
+const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+const quotient = (y, x) => Math.floor(y/x)
+const remainder = (y, x) => y % x
+
+const timeFormatted = (numberOfMillis) => {
+
+	const totalNumberOfSecs = quotient(numberOfMillis, 1000)
+	const millis = remainder(numberOfMillis, 1000)
+
+	const totalNumberOfMins = quotient(totalNumberOfSecs, 60)
+	const numberOfSecs = remainder(totalNumberOfSecs, 60)
+
+	const totalNumberOfHours = quotient(totalNumberOfMins, 60)
+	const numberOfMins = remainder(totalNumberOfMins, 60)
+
+	const numberOfHours = remainder(totalNumberOfHours, 24)
+	const numberOfDays = quotient(totalNumberOfHours, 24)
+
+	return numberOfDays + ":" +
+		('00' + numberOfHours).slice(-2) + ":"  + 
+		('00' + numberOfMins).slice(-2) + ":"  + 
+		('00' + numberOfSecs).slice(-2) //+ "." +
+		//+ millis
+}
+
+// functions that update the sortFunction
+const updateSort = s => {
+	Array.from(document.querySelectorAll(".sortButton")).forEach(x => x.classList.remove("selected"))
+	switch (s) {
+		case 'lastPassing':
+			Array.from(document.querySelectorAll(".lastPassing")).forEach(x => x.classList.add("selected"))
+			sortFunction = (a,b) => b.totaltimeofday.getTime() - a.totaltimeofday.getTime()
+			break;
+		case 'score':
+			Array.from(document.querySelectorAll(".score")).forEach(x => x.classList.add("selected"))
+			sortFunction = (a,b) => b.laps - a.laps
+			break;
+		case 'lifetime':
+			Array.from(document.querySelectorAll(".lifetime")).forEach(x => x.classList.add("selected"))
+			sortFunction = (a,b) => b.lmplusmiles - a.lmplusmiles
+			break;
+
+		default: 
+			Array.from(document.querySelectorAll(".name")).forEach(x => x.classList.add("selected"))
+			sortFunction = (a,b) => a.lastname.localeCompare(b.lastname) 
+	}
+}
+
+// functions that update the displayFunction
+const everyone = () => {
+	document.getElementById("sortOptions").classList.remove("no-show")
+
+	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
+	Array.from(document.querySelectorAll(".everyone")).forEach(x => x.classList.add("selected"))
+	displayFunction = (htmlElement, data) => {
+		htmlElement.replaceChildren(element("h1", "Race Results: Everyone"))
+		htmlElement.append(buildChart(data, true))
+	}
+}
+
+const specificRace = (raceId) => {
+	document.getElementById("sortOptions").classList.remove("no-show")
+
+	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
+	Array.from(document.querySelectorAll(".race" + raceId)).forEach(x => x.classList.add("selected"))
+	displayFunction = (htmlElement, data) => {
+		htmlElement.replaceChildren(element("h1", "Race Results: " + raceId))
+		htmlElement.append(buildChart( data.filter(x => x.class == raceId )))
+	}
+}
+
+const specificRunner = (r) => {
+	document.getElementById("sortOptions").classList.add("no-show")
+
+	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
+	Array.from(document.querySelectorAll(".sortButton")).forEach(x => x.classList.remove("selected"))
+
+	displayFunction = (htmlElement, data) => {
+
+		const runners = data.filter(x => true 
+			&& x.firstname == r.firstname 
+			&& x.lastname == r.lastname
+			&& x.age == r.age
+			&& x.city == r.city 
+			&& x.state == r.geostate			
+		)
+		
+		const t = element("h1", "Individual Runner Results")
+		t.classList.add("supersize")
+
+		htmlElement.replaceChildren(t)
+
+		runners.forEach(x => {
+			htmlElement.append(element("hr", ""))
+
+			const r1 = element("h1", `${x.fullname} from ${x.city} ${x.state} (${x.class})`)
+			const r2 = element("h2", `${x.laps} miles in ${x.totaltime}: ${appendThOrSt(x.positioninclass)} Place (${appendThOrSt(x.position)} overall)`)
+			const r3 = element("h3", `Most recent lap was completed in ${x.lasttime} (${x.lastspeed} MPH) at ${totaltimeofday(x.totaltime).toLocaleTimeString('en-US')}`)
+			const r4 = element("h4", `Average Mile: ${x.averagetime} (${x.averagespeed} MPH)`)
+			const r5 = element("h5", `Best Mile: ${x.bestinlap} - ${x.besttime} (${x.bestspeed} MPH), Second Best Mile: ${x.secondbestinlap} - ${x.secondbesttime} (${x.secondbestspeed} MPH)`)
+
+			Array(r1,r2,r3,r4,r5).forEach(x => htmlElement.append(x))
+
+			htmlElement.append(buildRunner(x))
+		})
+	}
+}
+
+const myHeaders = new Headers();
+myHeaders.append('pragma', 'no-cache');
+myHeaders.append('cache-control', 'no-cache');
+
+const buildRunner = (runner) => {
+	const table = document.createElement("table")
+
+	Object.keys(runner).forEach(key => {
+		const row = document.createElement("tr");
+		row.appendChild(element("td", key))
+		row.appendChild(element("td", runner[key]))
+		table.appendChild(row)
+	})
+	return table
+}
+
+const buildChart = (myJson, displayClass) => {
+
+	const rawRunnerToUriRunner = (runner) => encodeURIComponent(JSON.stringify({	
+		"lastname": runner.lastname,
+		"firstname": runner.firstname,
+		"age": runner.age,
+		"city": runner.city,
+		"geostate": runner.state || runner.geostate || "",
+	}))
+
+	const table = document.createElement("table")
+	const head = document.createElement("tr");
+
+	if (displayClass) head.appendChild(element("th", "class"))
+	head.appendChild(element("th", "Runner"))
+	head.appendChild(element("th", "From", true))
+	head.appendChild(element("th", "Miles"))
+	if (lifeTimeEnabled) {head.appendChild(element("th", "Lifetime", true))}
+	head.appendChild(element("th", "Total Time"))
+	head.appendChild(element("th", "Average Mile", true))
+	head.appendChild(element("th", "Last Passing"))
+
+	table.append(head)
+
+	myJson.map(x=> {
+		const lastTimeOfDay = totaltimeofday(x.totaltime);
+		x.totaltimeofday = lastTimeOfDay;
+		x.timeSinceStart = timeSinceStart(x.averagetime, x.laps)
+		x.lm = x.lm || 0
+		x.miles = Number(x.laps)
+		x.lmplusmiles = x.lm+x.miles
+		return x
+	})
+	.sort(sortFunction)
+	.forEach( x => {
+
+		const row = document.createElement("tr")
+		if (displayClass) row.appendChild(element("td", x.class))
+		if (x.yellow) row.classList.add("yellow")
+		const name = element("td", x.fullname)
+		name.appendChild(element("span", " (" + x.age + "/" + x.gender + ")", true))
+		row.appendChild(name)
+		row.appendChild(element("td", x.city + " " + x.state, true))
+		row.appendChild(element("td", x.laps))
+		if (lifeTimeEnabled) { row.appendChild(element("td", (x.lmplusmiles || 0).toFixed(1), true)) }
+		row.appendChild(element("td", timeFormatted(x.timeSinceStart)))
+		row.appendChild(element("td", x.averagetime, true))
+		row.appendChild(element("td", x.totaltimeofday.toLocaleTimeString('en-US')))
+
+		row.addEventListener("click", () => { 
+			const r = rawRunnerToUriRunner( Object.assign(x))
+			updateMutableState({...state, "r": '', "p": r})				
+		});
+
+		table.appendChild(row)
+	})
+
+	return table;
+}
+
+const render = (data, domElement, func) => {
+	func(domElement, data)
+
+    // // get most recent time across
+    const timeAcross = data.reduce( (acc, val) => totaltimeofday(val.totaltime) > acc?totaltimeofday(val.totaltime):acc , 0)
+    document.getElementById("lastupdate").replaceChildren( "Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'))
+}
+
+const checkVersion = () => {
+	return new Promise ((resolve, reject) => {
+		fetch('./version.json?forceCache=' + new Date().getTime(), {
+			method: 'GET',
+				headers: myHeaders,
+			})
+			.then(function(response) {
+				return resolve(response.json());
+			})
+		})
+	}
+
+const updateData = () => {
+	console.log("Updating at", new Date());
+
+	return new Promise ((resolve, reject) => {
+		fetch('./result.json?forceCache=' + new Date().getTime(), {
+			method: 'GET',
+			headers: myHeaders,
+		})
+		.then(function(response) {
+			return resolve(response.json());
+		})
+	})
+}
+
+const loop = () => {
+	checkVersion().then(newVersion => {
+		const el = document.getElementById("versionNotification");
+		if (newVersion.version != version && el.classList.contains("no-show")) {
+			el.classList.remove("no-show")
+			const url = `./index.html?forceCache=${new Date().getTime()}`
+			const a = document.createElement("a")
+			a.setAttribute("href", url)
+			a.append(document.createTextNode("here"))
+			el.append(document.createTextNode("A new version of this is page is available. Please click "))
+			el.append(a)
+			el.append(document.createTextNode(" to refresh."))
+		}
+	});
+
+	updateData().then(resultsData => {
+		const r = resultsData.map(runner => {
+				const n = (runner.firstname.trim() + " " + runner.lastname.trim()).toLowerCase()
+				const a = lifeTimeEnabled?[n]:{}
+				return {...runner, ...a}	
+			})
+		const resultsDiv = document.getElementById("resultsDiv")
+		render(r, resultsDiv, displayFunction)
+	});
+}
+
+const parseUrlParams = () => {
+   const hash = window.location.hash
+   const parsed = hash.substring(1).split("|")
+   if (parsed.length == 3) {
+	return { "r": parsed[0], "s": parsed[1], "p": parsed[2] }
+   } else {
+	const urlParams = new URLSearchParams(window.location.search);
+  return { "r": urlParams.get("r") || "", "s": urlParams.get("s") || "", "p": urlParams.get("p") || "" }
+   }
+}
+
+const loadLifetime = () => {
+
+		return new Promise ((resolve, reject) => {
+			fetch('./lifetime.json?forceCache=' + new Date().getTime(), {
+				method: 'GET',
+				headers: myHeaders,
+			})
+			.then(function(response) {
+				resolve(response.json());
+			})
+		})	
+}
+
+lifetime = loadLifetime().then(r => {
+	lifetime = r
+	// Default value for sort and display Functions
+	updateMutableState(parseUrlParams())
+	setInterval(loop, 60*1000);
+});
+
+
+window.addEventListener('popstate', function() {
+		updateMutableState(parseUrlParams(), true)
+	}
+);
+
+</script>
+</body>
+</html>

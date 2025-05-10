@@ -1,0 +1,810 @@
+{
+    "gary ferguson": {
+      "lm": 3386.34,
+      "yellow": true
+    },
+    "jim cook": {
+      "lm": 3039,
+      "yellow": false
+    },
+    "david lettieri": {
+      "lm": 2790.81,
+      "yellow": true
+    },
+    "bill gentry": {
+      "lm": 2788.7,
+      "yellow": false
+    },
+    "darlene kresse": {
+      "lm": 2509,
+      "yellow": false
+    },
+    "fred murolo": {
+      "lm": 2427.37,
+      "yellow": true
+    },
+    "philip eberts": {
+      "lm": 2394,
+      "yellow": false
+    },
+    "joan cook": {
+      "lm": 2386.4,
+      "yellow": false
+    },
+    "fran libasci": {
+      "lm": 2343,
+      "yellow": false
+    },
+    "tom brand": {
+      "lm": 2286.8,
+      "yellow": false
+    },
+    "darren worts": {
+      "lm": 2276.6,
+      "yellow": false
+    },
+    "pablo espinosa": {
+      "lm": 1785.7,
+      "yellow": false
+    },
+    "thomas nasuta": {
+      "lm": 1783,
+      "yellow": false
+    },
+    "scotty eckert": {
+      "lm": 1620,
+      "yellow": false
+    },
+    "charlie upshall": {
+      "lm": 1530,
+      "yellow": false
+    },
+    "steven tursi": {
+      "lm": 1502.76,
+      "yellow": true
+    },
+    "walt hamer": {
+      "lm": 1500,
+      "yellow": false
+    },
+    "gerald tabios": {
+      "lm": 1474,
+      "yellow": false
+    },
+    "john beck": {
+      "lm": 1409,
+      "yellow": false
+    },
+    "christopher delucia": {
+      "lm": 1320,
+      "yellow": false
+    },
+    "chris battaglia": {
+      "lm": 1297,
+      "yellow": false
+    },
+    "kevin flood": {
+      "lm": 1284.74,
+      "yellow": false
+    },
+    "steve hanes": {
+      "lm": 1262.8,
+      "yellow": false
+    },
+    "margaret schlundt": {
+      "lm": 1231.3,
+      "yellow": false
+    },
+    "phil blandine": {
+      "lm": 1199.78,
+      "yellow": false
+    },
+    "ed peters": {
+      "lm": 1193,
+      "yellow": false
+    },
+    "paul heckert": {
+      "lm": 1185.1,
+      "yellow": false
+    },
+    "newton baker": {
+      "lm": 1144,
+      "yellow": false
+    },
+    "melissa huggins": {
+      "lm": 1136.61,
+      "yellow": false
+    },
+    "joseph laskey": {
+      "lm": 1096,
+      "yellow": false
+    },
+    "daniel o'keefe": {
+      "lm": 1058,
+      "yellow": false
+    },
+    "paul rogers": {
+      "lm": 978.8,
+      "yellow": false
+    },
+    "kimberley sergeant": {
+      "lm": 949.2,
+      "yellow": false
+    },
+    "lisa gesualdo": {
+      "lm": 923,
+      "yellow": false
+    },
+    "trishul cherns": {
+      "lm": 857,
+      "yellow": false
+    },
+    "beth pretti": {
+      "lm": 846.1,
+      "yellow": false
+    },
+    "john szilezy": {
+      "lm": 829.6,
+      "yellow": false
+    },
+    "john paluchowski": {
+      "lm": 814.78,
+      "yellow": false
+    },
+    "scott perrapato": {
+      "lm": 809,
+      "yellow": false
+    },
+    "alanna garrison-kast": {
+      "lm": 760.4,
+      "yellow": false
+    },
+    "helen clark": {
+      "lm": 751,
+      "yellow": false
+    },
+    "emmy stocker": {
+      "lm": 740.63,
+      "yellow": false
+    },
+    "jessica lemay": {
+      "lm": 734,
+      "yellow": false
+    },
+    "mike potter": {
+      "lm": 730.1,
+      "yellow": false
+    },
+    "steven smith": {
+      "lm": 693,
+      "yellow": false
+    },
+    "ryan jones": {
+      "lm": 690,
+      "yellow": false
+    },
+    "george biondic": {
+      "lm": 655,
+      "yellow": false
+    },
+    "colleen drahos": {
+      "lm": 647,
+      "yellow": false
+    },
+    "john brown": {
+      "lm": 629,
+      "yellow": false
+    },
+    "robert kootz": {
+      "lm": 580,
+      "yellow": false
+    },
+    "patrick mchenry": {
+      "lm": 577,
+      "yellow": false
+    },
+    "rick mcnulty": {
+      "lm": 571.55,
+      "yellow": true
+    },
+    "bob oberkehr": {
+      "lm": 566,
+      "yellow": false
+    },
+    "genice rill": {
+      "lm": 545,
+      "yellow": false
+    },
+    "anya mcnulty": {
+      "lm": 543.32,
+      "yellow": true
+    },
+    "linda kenny": {
+      "lm": 539.8,
+      "yellow": false
+    },
+    "justin aman": {
+      "lm": 535,
+      "yellow": false
+    },
+    "brian nephew": {
+      "lm": 528,
+      "yellow": false
+    },
+    "carl finacchio": {
+      "lm": 524,
+      "yellow": false
+    },
+    "cindy sullivan": {
+      "lm": 523,
+      "yellow": false
+    },
+    "francis kwok": {
+      "lm": 518.5,
+      "yellow": false
+    },
+    "jill hudson": {
+      "lm": 509,
+      "yellow": false
+    },
+    "mary worts": {
+      "lm": 506.52,
+      "yellow": false
+    },
+    "brice clapp": {
+      "lm": 502,
+      "yellow": false
+    },
+    "clifford lange": {
+      "lm": 500,
+      "yellow": false
+    },
+    "mark hinkeldey": {
+      "lm": 485,
+      "yellow": false
+    },
+    "paul baillif": {
+      "lm": 480.15,
+      "yellow": false
+    },
+    "suzanne weightman": {
+      "lm": 446,
+      "yellow": false
+    },
+    "michael renz": {
+      "lm": 442,
+      "yellow": false
+    },
+    "eugene bruckert": {
+      "lm": 440.32,
+      "yellow": false
+    },
+    "roman matuska": {
+      "lm": 439,
+      "yellow": false
+    },
+    "david redline": {
+      "lm": 438,
+      "yellow": false
+    },
+    "jennifer tylenda": {
+      "lm": 436,
+      "yellow": false
+    },
+    "penelope delucia": {
+      "lm": 435.6,
+      "yellow": false
+    },
+    "jessica mullen": {
+      "lm": 434,
+      "yellow": false
+    },
+    "george hobart": {
+      "lm": 430.8,
+      "yellow": false
+    },
+    "quinn mcnulty": {
+      "lm": 421.87,
+      "yellow": true
+    },
+    "bob law": {
+      "lm": 420,
+      "yellow": false
+    },
+    "hui yang": {
+      "lm": 419,
+      "yellow": false
+    },
+    "michael turano": {
+      "lm": 415,
+      "yellow": false
+    },
+    "jerome scaturro": {
+      "lm": 414,
+      "yellow": false
+    },
+    "matthew miller": {
+      "lm": 408,
+      "yellow": false
+    },
+    "dominick demarco": {
+      "lm": 391.5,
+      "yellow": false
+    },
+    "bill heldenbrand": {
+      "lm": 379,
+      "yellow": false
+    },
+    "michael lasusa": {
+      "lm": 374,
+      "yellow": false
+    },
+    "anton struntz": {
+      "lm": 370.4,
+      "yellow": false
+    },
+    "vinod kripalu": {
+      "lm": 366,
+      "yellow": false
+    },
+    "amanda bundek": {
+      "lm": 363.33,
+      "yellow": false
+    },
+    "peter priolo": {
+      "lm": 361,
+      "yellow": false
+    },
+    "elwin wu": {
+      "lm": 358,
+      "yellow": false
+    },
+    "michael senko": {
+      "lm": 356,
+      "yellow": false
+    },
+    "gary sexton": {
+      "lm": 329,
+      "yellow": false
+    },
+    "jane burleson": {
+      "lm": 311.6,
+      "yellow": false
+    },
+    "matthew weldon": {
+      "lm": 303,
+      "yellow": false
+    },
+    "randy mcnulty": {
+      "lm": 300.17,
+      "yellow": true
+    },
+    "philip cappuccio": {
+      "lm": 291,
+      "yellow": false
+    },
+    "jessica elster": {
+      "lm": 281,
+      "yellow": false
+    },
+    "karen giroux": {
+      "lm": 270,
+      "yellow": false
+    },
+    "anthony viola": {
+      "lm": 269,
+      "yellow": false
+    },
+    "rick levin": {
+      "lm": 265,
+      "yellow": false
+    },
+    "fred wolodiger": {
+      "lm": 264.7,
+      "yellow": false
+    },
+    "arun bhardwaj": {
+      "lm": 254,
+      "yellow": false
+    },
+    "erin stettler": {
+      "lm": 253.34,
+      "yellow": false
+    },
+    "jeff burleson": {
+      "lm": 235.8,
+      "yellow": false
+    },
+    "al emma": {
+      "lm": 233.6,
+      "yellow": false
+    },
+    "joseph zimmerman": {
+      "lm": 220.3,
+      "yellow": false
+    },
+    "donna lalli": {
+      "lm": 216,
+      "yellow": false
+    },
+    "katherine bowders": {
+      "lm": 216,
+      "yellow": false
+    },
+    "sarah sheridan": {
+      "lm": 212,
+      "yellow": false
+    },
+    "albert lione": {
+      "lm": 211,
+      "yellow": false
+    },
+    "erik kuhi": {
+      "lm": 206,
+      "yellow": false
+    },
+    "tim hardy": {
+      "lm": 205,
+      "yellow": false
+    },
+    "yen nguyen": {
+      "lm": 204,
+      "yellow": false
+    },
+    "fernando gisone": {
+      "lm": 202,
+      "yellow": false
+    },
+    "alissa hart": {
+      "lm": 185,
+      "yellow": false
+    },
+    "angela scarinci": {
+      "lm": 184,
+      "yellow": false
+    },
+    "mark hamersly": {
+      "lm": 181,
+      "yellow": false
+    },
+    "kathy szilezy": {
+      "lm": 172.2,
+      "yellow": false
+    },
+    "shannon mcginn": {
+      "lm": 170.24,
+      "yellow": false
+    },
+    "mark henderson": {
+      "lm": 154,
+      "yellow": false
+    },
+    "bill freind": {
+      "lm": 151,
+      "yellow": false
+    },
+    "michael condella": {
+      "lm": 151,
+      "yellow": false
+    },
+    "donna hamer": {
+      "lm": 148,
+      "yellow": false
+    },
+    "christopher tyburski": {
+      "lm": 147,
+      "yellow": false
+    },
+    "jacky lee": {
+      "lm": 145,
+      "yellow": false
+    },
+    "lorrie hanes": {
+      "lm": 139.77,
+      "yellow": false
+    },
+    "anthony batko": {
+      "lm": 138.3,
+      "yellow": false
+    },
+    "mandy jellerichs": {
+      "lm": 137,
+      "yellow": false
+    },
+    "jeff christakos": {
+      "lm": 135,
+      "yellow": false
+    },
+    "jonathan wilson": {
+      "lm": 132.31,
+      "yellow": false
+    },
+    "adrienne holmes": {
+      "lm": 130,
+      "yellow": false
+    },
+    "jodie hayes": {
+      "lm": 127,
+      "yellow": false
+    },
+    "laurie pattison-gordon": {
+      "lm": 127,
+      "yellow": false
+    },
+    "alan levin": {
+      "lm": 126,
+      "yellow": false
+    },
+    "joe cleary": {
+      "lm": 125.2,
+      "yellow": false
+    },
+    "albert galatan": {
+      "lm": 116,
+      "yellow": false
+    },
+    "eric meisner": {
+      "lm": 116,
+      "yellow": false
+    },
+    "charles butler": {
+      "lm": 115,
+      "yellow": false
+    },
+    "john syarto": {
+      "lm": 115,
+      "yellow": false
+    },
+    "alexander rylyakov": {
+      "lm": 113,
+      "yellow": false
+    },
+    "gail gilman": {
+      "lm": 112,
+      "yellow": false
+    },
+    "john d’orio": {
+      "lm": 112,
+      "yellow": false
+    },
+    "logan liskovec": {
+      "lm": 112,
+      "yellow": false
+    },
+    "murat yaprak": {
+      "lm": 112,
+      "yellow": false
+    },
+    "randy huggins": {
+      "lm": 106,
+      "yellow": false
+    },
+    "matthew mouser": {
+      "lm": 104.8,
+      "yellow": false
+    },
+    "ed dodd": {
+      "lm": 104,
+      "yellow": false
+    },
+    "julie lyness": {
+      "lm": 104,
+      "yellow": false
+    },
+    "ron hartlaub": {
+      "lm": 104,
+      "yellow": false
+    },
+    "tom tylenda": {
+      "lm": 103.1,
+      "yellow": false
+    },
+    "kevin hoegler": {
+      "lm": 102,
+      "yellow": false
+    },
+    "claire robinson-white": {
+      "lm": 101,
+      "yellow": false
+    },
+    "peter wassel": {
+      "lm": 101,
+      "yellow": false
+    },
+    "bob mccubbin": {
+      "lm": 100,
+      "yellow": false
+    },
+    "jeanine stank": {
+      "lm": 89,
+      "yellow": false
+    },
+    "melissa lowe": {
+      "lm": 89,
+      "yellow": false
+    },
+    "jessica lyons": {
+      "lm": 85,
+      "yellow": false
+    },
+    "matthew algeo": {
+      "lm": 82,
+      "yellow": false
+    },
+    "christy cunningham": {
+      "lm": 73.2,
+      "yellow": false
+    },
+    "michele gorman": {
+      "lm": 72.2,
+      "yellow": false
+    },
+    "aaron taube": {
+      "lm": 67,
+      "yellow": false
+    },
+    "dale nunn": {
+      "lm": 67,
+      "yellow": false
+    },
+    "joseph bovo": {
+      "lm": 65,
+      "yellow": false
+    },
+    "alexander neeb": {
+      "lm": 64,
+      "yellow": false
+    },
+    "sanghoon kim": {
+      "lm": 62,
+      "yellow": false
+    },
+    "marie mcnulty": {
+      "lm": 59,
+      "yellow": false
+    },
+    "joe palone": {
+      "lm": 56,
+      "yellow": false
+    },
+    "april lemieux": {
+      "lm": 55,
+      "yellow": false
+    },
+    "thomas coleman": {
+      "lm": 52.4,
+      "yellow": false
+    },
+    "melissa mcdaniel": {
+      "lm": 51,
+      "yellow": false
+    },
+    "caleb cimini": {
+      "lm": 50,
+      "yellow": false
+    },
+    "joseph kolok": {
+      "lm": 50,
+      "yellow": false
+    },
+    "scott pretti": {
+      "lm": 50,
+      "yellow": false
+    },
+    "melissa blume": {
+      "lm": 48,
+      "yellow": false
+    },
+    "jeffrey dunn": {
+      "lm": 47,
+      "yellow": false
+    },
+    "joanna tremper": {
+      "lm": 47,
+      "yellow": false
+    },
+    "randy gagnon": {
+      "lm": 45,
+      "yellow": false
+    },
+    "michelle regn": {
+      "lm": 42,
+      "yellow": false
+    },
+    "jennifer wassel": {
+      "lm": 40,
+      "yellow": false
+    },
+    "alexa friedman": {
+      "lm": 36,
+      "yellow": false
+    },
+    "kaylee worts": {
+      "lm": 34,
+      "yellow": false
+    },
+    "amanda williams": {
+      "lm": 33,
+      "yellow": false
+    },
+    "ashley schreyer": {
+      "lm": 32,
+      "yellow": false
+    },
+    "meera kripalu": {
+      "lm": 32,
+      "yellow": false
+    },
+    "peter bennett": {
+      "lm": 32,
+      "yellow": false
+    },
+    "clint burleson": {
+      "lm": 31.1,
+      "yellow": false
+    },
+    "ken grisback": {
+      "lm": 31.1,
+      "yellow": false
+    },
+    "lilly holmes": {
+      "lm": 31.1,
+      "yellow": false
+    },
+    "peyton capolino": {
+      "lm": 31.1,
+      "yellow": false
+    },
+    "jennifer mcnulty": {
+      "lm": 28.72,
+      "yellow": false
+    },
+    "carly gieseler": {
+      "lm": 28,
+      "yellow": false
+    },
+    "donald neeb": {
+      "lm": 26.2,
+      "yellow": false
+    },
+    "jennifer maher": {
+      "lm": 26.2,
+      "yellow": false
+    },
+    "katie rogers": {
+      "lm": 26.2,
+      "yellow": false
+    },
+    "patricia lytle": {
+      "lm": 26.2,
+      "yellow": false
+    },
+    "stephanie paluchowski": {
+      "lm": 26.2,
+      "yellow": false
+    },
+    "bonnie lytle": {
+      "lm": 24,
+      "yellow": false
+    },
+    "michael fratto": {
+      "lm": 21,
+      "yellow": false
+    },
+    "ron corneau": {
+      "lm": 21,
+      "yellow": false
+    },
+    "kc kleinman": {
+      "lm": 16,
+      "yellow": false
+    },
+    "crystal jackson": {
+      "lm": 102,
+      "yellow": false
+    },
+    "joseph gorlaski": {
+      "lm": 409,
+      "yellow": false
+    }    
+  }
