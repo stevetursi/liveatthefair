@@ -250,6 +250,23 @@ const timeFormatted = (numberOfMillis) => {
 		//+ millis
 }
 
+const getNewLifetimeAward = (before, after) => {
+  const thresholds = [
+    { miles: 100, label: "100 Mile Coin" },
+    { miles: 250, label: "250 Mile Coin" },
+    { miles: 500, label: "500 Mile Coin" },
+    { miles: 1000, label: "1000 Mile Coin" },
+    { miles: 1500, label: "1500 Mile Brick" },
+    { miles: 2000, label: "2000 Mile Stained Glass" },
+    { miles: 2500, label: "2500 Mile Award" },
+    { miles: 4000, label: "4000 Mile Award" }
+  ];
+
+  return thresholds
+    .filter(t => before < t.miles && after >= t.miles)
+    .map(t => t.label);
+};
+
 // functions that update the sortFunction
 const updateSort = s => {
 	Array.from(document.querySelectorAll(".sortButton")).forEach(x => x.classList.remove("selected"))
@@ -370,6 +387,7 @@ const buildChart = (myJson, displayClass) => {
 	head.appendChild(element("th", "Total Time"))
 	head.appendChild(element("th", "Average Mile", true))
 	head.appendChild(element("th", "Last Passing"))
+	head.appendChild(element("th", "Awards", true))  
 
 	table.append(head)
 
@@ -403,11 +421,39 @@ const buildChart = (myJson, displayClass) => {
 			updateMutableState({...state, "r": '', "p": r})				
 		});
 
+		const awards = [];
+
+		// Lifetime award(s): only if they crossed new threshold(s) this year
+		const key = x.fullname.toLowerCase();
+		if (lifetime[key]) {
+		const before = lifetime[key].lm;
+		const after = x.lmplusmiles;
+		awards.push(...getNewLifetimeAward(before, after));
+		}
+
+		// Event-based awards
+		const m = Number(x.laps);
+		if (x.class === "Marathon" && m >= 26) awards.push("Marathon Coin");
+		else if (x.class === "50K" && m >= 31) awards.push("50K Coin");
+		else if (x.class === "Quadzilla" && m >= 104) awards.push("Quadzilla Coin");
+
+		if (m >= 505) awards.push("505 Belt Buckle");
+		else if (m >= 404) awards.push("404 Belt Buckle");
+		else if (m >= 303) awards.push("303 Belt Buckle");
+		else if (m >= 202) awards.push("202 Belt Buckle");
+		else if (m >= 101) awards.push("101 Belt Buckle");
+
+		// Add to row
+		const awardsCell = element("td", awards.join(", "), true); // desktop-only
+		row.appendChild(awardsCell);
+
+
 		table.appendChild(row)
 	})
 
 	return table;
 }
+
 
 const render = (data, domElement, func) => {
 	func(domElement, data)
@@ -424,7 +470,7 @@ const checkVersion = () => {
       method: 'GET',
       headers: myHeaders,
     })
-    .then(response => resolve(response.json())) // ← this line
+    .then(response => resolve(response.json())) 
     .catch(err => {
       console.error("Version check failed:", err);
       resolve(null);
