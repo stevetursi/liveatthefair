@@ -339,11 +339,10 @@ const specificRunner = (r) => {
 
 			const r1 = element("h1", `${x.fullname} from ${x.city} ${x.state} (${x.class})`)
 			const r2 = element("h2", `${x.laps} miles in ${x.totaltime}: ${appendThOrSt(x.positioninclass)} Place (${appendThOrSt(x.position)} overall)`)
-			const r3 = element("h3", `Most recent lap was completed in ${x.lasttime} (${x.lastspeed} MPH) at ${totaltimeofday(x.totaltime).toLocaleTimeString('en-US')}`)
+			const r3 = element("h3", `Most recent lap was completed in ${x.lasttime} at ${totaltimeofday(x.totaltime).toLocaleTimeString('en-US')}`)
 			const r4 = element("h4", `Average Mile: ${x.averagetime} (${x.averagespeed} MPH)`)
-			const r5 = element("h5", `Best Mile: ${x.bestinlap} - ${x.besttime} (${x.bestspeed} MPH), Second Best Mile: ${x.secondbestinlap} - ${x.secondbesttime} (${x.secondbestspeed} MPH)`)
 
-			Array(r1,r2,r3,r4,r5).forEach(x => htmlElement.append(x))
+			Array(r1,r2,r3,r4).forEach(x => htmlElement.append(x))
 
 			htmlElement.append(buildRunner(x))
 		})
