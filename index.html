@@ -10,7 +10,7 @@
 	const version = "__VERSION__";
 	const lifeTimeEnabled = true;
 
-	const yellowIds = [1001,1004,1011,1016,1020,1124,1108,1105,1216,1696,2197]
+	const yellowIds = {1001:true,1004:true,1011:true,1016:true,1020:true,1124:true,1108:true,1105:true,1216:true,1696:true,2197:true}
 
 	// Global mutable state: displayFunction && sortFunction
 	let displayFunction = () => {}
@@ -406,7 +406,7 @@ const buildChart = (myJson, displayClass) => {
 
 		const row = document.createElement("tr")
 		if (displayClass) row.appendChild(element("td", x.class))
-		if (x.yellow) row.classList.add("yellow")
+		if (yellowIds[x.runnerid]) row.classList.add("yellow")
 		const name = element("td", x.fullname)
 		name.appendChild(element("span", " (" + x.age + "/" + x.gender + ")", true))
 		row.appendChild(name)
