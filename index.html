@@ -177,7 +177,7 @@
 	<button class="sortButton lifetime desktop-only" onClick="updateMutableState({...state, s: 'lifetime'})">Lifetime</button>
 	<div>Tip: Click on a runner's name for their details!</div>
 </div>
-<div class="desktop-only"><span class="yellow">Yellow background</span> indicates runner has run every year in The Fair's history</div>
+<div class="desktop-only"><span class="yellow">Yellow background</span> indicates runner has participated every year in The Fair's history</div>
 
 <div id="resultsDiv"></div>
 
@@ -430,9 +430,9 @@ const buildChart = (myJson, displayClass) => {
 
 		// Event-based awards
 		const m = Number(x.laps);
-		if (x.class === "Marathon" && m >= 26) awards.push("Marathon Coin");
-		else if (x.class === "50K" && m >= 31) awards.push("50K Coin");
-		else if (x.class === "Quadzilla" && m >= 104) awards.push("Quadzilla Coin");
+		if (x.class === "Marathon" && m >= 27) awards.push("Marathon Coin");
+		else if (x.class === "50K" && m >= 32) awards.push("50K Coin");
+		else if (x.class === "Quadzilla" && m >= 108) awards.push("Quadzilla Coin");
 
 		if (m >= 505) awards.push("505 Belt Buckle");
 		else if (m >= 404) awards.push("404 Belt Buckle");
