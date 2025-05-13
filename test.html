@@ -308,12 +308,13 @@ const everyone = () => {
 			const laps = parseInt(cur.laps || "0", 10);
 
 			if (!acc[id]) {
-				acc[id] = { ...cur, totallaps: laps };
+				acc[id] = { ...cur};
 			} else {
-				acc[id].totallaps += laps;
-
 				if (cur.totaltime > acc[id].totaltime) {
-				acc[id] = { ...cur, totallaps: acc[id].totallaps };
+					acc[id] = { ...cur, totallaps: acc[id].totallaps, class: "multiple races" };
+				} else {
+					acc[id].totallaps += laps;
+					acc[id].class = "multiple races";
 				}
 			}
 
