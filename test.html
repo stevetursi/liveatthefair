@@ -321,7 +321,7 @@ const everyone = () => {
 		}, {});
 
 		htmlElement.replaceChildren(element("h1", "Race Results: Everyone"))
-		htmlElement.append(buildChart(combinedData, true))
+		htmlElement.append(buildChart(Object.values(combinedData), true))
 	}
 }
 
