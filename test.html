@@ -310,11 +310,13 @@ const everyone = () => {
 			if (!acc[id]) {
 				acc[id] = { ...cur };
 			} else {
-				acc[id].totallaps += laps;
+				const totallaps = acc[id].totallaps += laps;
 
 				// Replace if this entry has a longer total time
 				if (cur.totaltime > acc[id].totaltime) {
-					acc[id] = { ...cur, totallaps: acc[id].totallaps };
+					acc[id] = { ...cur, totallaps: totallaps };
+				} else {
+					acc[id].totallaps = totallaps
 				}
 
 				acc[id].class = "multiple races";
@@ -410,8 +412,8 @@ const buildChart = (myJson, displayClass) => {
 	head.appendChild(element("th", "Runner"))
 	head.appendChild(element("th", "From", true))
 	head.appendChild(element("th", "Miles"))
-	head.appendChild(element("th", "Combined Miles"))
-	if (lifeTimeEnabled) {head.appendChild(element("th", "Lifetime Miles", true))}
+	head.appendChild(element("th", "Multis Combined"))
+	if (lifeTimeEnabled) {head.appendChild(element("th", "Lifetime", true))}
 	head.appendChild(element("th", "Total Time"))
 	head.appendChild(element("th", "Average Mile", true))
 	head.appendChild(element("th", "Last Passing"))

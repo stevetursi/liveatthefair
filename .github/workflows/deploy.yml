@@ -48,4 +48,4 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id $CLOUDFRONT_DISTRO_ID \
-            --paths "/index.html" "/version.json"
+            --paths "/index.html" "/version.json" "/test.html"
