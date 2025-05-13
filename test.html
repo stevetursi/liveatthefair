@@ -9,8 +9,9 @@
 	const raceStart = new Date('Mon May 12 2025 09:00:00 GMT-0400');
 	const version = "__VERSION__";
 	const lifeTimeEnabled = true;
+	const displayId = true;
 
-	const yellowIds = [1001,1004,1011,1016,1020,1124,1108,1105,1216,1696,2197]
+	const yellowIds = {1001:true,1004:true,1011:true,1016:true,1020:true,1124:true,1108:true,1105:true,1216:true,1696:true,2197:true}
 
 	// Global mutable state: displayFunction && sortFunction
 	let displayFunction = () => {}
@@ -177,7 +178,7 @@
 	<button class="sortButton lifetime desktop-only" onClick="updateMutableState({...state, s: 'lifetime'})">Lifetime</button>
 	<div>Tip: Click on a runner's name for their details!</div>
 </div>
-<div class="desktop-only"><span class="yellow">Yellow background</span> indicates runner has run every year in The Fair's history</div>
+<div class="desktop-only"><span class="yellow">Yellow background</span> indicates runner has participated every year in The Fair's history</div>
 
 <div id="resultsDiv"></div>
 
@@ -254,14 +255,16 @@ const timeFormatted = (numberOfMillis) => {
 
 const getNewLifetimeAward = (before, after) => {
   const thresholds = [
-    { miles: 100, label: "100 Mile Coin" },
-    { miles: 250, label: "250 Mile Coin" },
-    { miles: 500, label: "500 Mile Coin" },
-    { miles: 1000, label: "1000 Mile Coin" },
-    { miles: 1500, label: "1500 Mile Brick" },
-    { miles: 2000, label: "2000 Mile Stained Glass" },
-    { miles: 2500, label: "2500 Mile Award" },
-    { miles: 4000, label: "4000 Mile Award" }
+    { miles: 100, label: "100 Mile Lifetime Coin" },
+    { miles: 250, label: "250 Mile Lifetime Coin" },
+    { miles: 500, label: "500 Mile Lifetime Coin" },
+    { miles: 1000, label: "1000 Mile Lifetime Coin" },
+    { miles: 1500, label: "1500 Mile Lifetime Brick" },
+    { miles: 2000, label: "2000 Mile Lifetime Stained Glass" },
+    { miles: 2500, label: "2500 Mile Lifetime Clock" },
+    { miles: 2500, label: "3000 Mile Lifetime Stained Glass" },
+    { miles: 2500, label: "3500 Mile Lifetime Stained Glass" },
+    { miles: 4000, label: "4000 Mile Lifetime Stained Glass" }
   ];
 
   return thresholds
@@ -299,8 +302,26 @@ const everyone = () => {
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".everyone")).forEach(x => x.classList.add("selected"))
 	displayFunction = (htmlElement, data) => {
+
+		const combinedData = data.reduce((acc, cur) => {
+			const id = cur.runnerid;
+			const laps = parseInt(cur.laps || "0", 10);
+
+			if (!acc[id]) {
+				acc[id] = { ...cur, totallaps: laps };
+			} else {
+				acc[id].totallaps += laps;
+
+				if (cur.totaltime > acc[id].totaltime) {
+				acc[id] = { ...cur, totallaps: acc[id].totallaps };
+				}
+			}
+
+			return acc;
+		}, {});
+
 		htmlElement.replaceChildren(element("h1", "Race Results: Everyone"))
-		htmlElement.append(buildChart(data, true))
+		htmlElement.append(buildChart(combinedData, true))
 	}
 }
 
@@ -380,10 +401,12 @@ const buildChart = (myJson, displayClass) => {
 	const table = document.createElement("table")
 	const head = document.createElement("tr");
 
+	if (displayId) head.appendChild(element("th", "id"))
 	if (displayClass) head.appendChild(element("th", "class"))
 	head.appendChild(element("th", "Runner"))
 	head.appendChild(element("th", "From", true))
-	head.appendChild(element("th", "Miles"))
+	head.appendChild(element("th", "Miles (current)"))
+	head.appendChild(element("th", "Miles (all)"))
 	if (lifeTimeEnabled) {head.appendChild(element("th", "Lifetime", true))}
 	head.appendChild(element("th", "Total Time"))
 	head.appendChild(element("th", "Average Mile", true))
@@ -397,7 +420,7 @@ const buildChart = (myJson, displayClass) => {
 		x.totaltimeofday = lastTimeOfDay;
 		x.timeSinceStart = timeSinceStart(x.averagetime, x.laps)
 		x.lm = lifetime.m[x.runnerid] || 0
-		x.miles = Number(x.laps)
+		x.miles = Number(x.totallaps)
 		x.lmplusmiles = x.lm+x.miles
 		return x
 	})
@@ -405,13 +428,15 @@ const buildChart = (myJson, displayClass) => {
 	.forEach( x => {
 
 		const row = document.createElement("tr")
+		if (displayId) row.appendChild(element("td", x.runnerid))
 		if (displayClass) row.appendChild(element("td", x.class))
-		if (x.yellow) row.classList.add("yellow")
+		if (yellowIds[x.runnerid]) row.classList.add("yellow")
 		const name = element("td", x.fullname)
 		name.appendChild(element("span", " (" + x.age + "/" + x.gender + ")", true))
 		row.appendChild(name)
 		row.appendChild(element("td", x.city + " " + x.state, true))
 		row.appendChild(element("td", x.laps))
+		row.appendChild(element("td", x.totallaps))
 		if (lifeTimeEnabled) { row.appendChild(element("td", (x.lmplusmiles || 0).toFixed(1), true)) }
 		row.appendChild(element("td", timeFormatted(x.timeSinceStart)))
 		row.appendChild(element("td", x.averagetime, true))
@@ -424,19 +449,13 @@ const buildChart = (myJson, displayClass) => {
 
 		const awards = [];
 
-		// Lifetime award(s): only if they crossed new threshold(s) this year
-		const key = x.fullname.toLowerCase();
-		if (lifetime[key]) {
-		const before = lifetime[key].lm;
-		const after = x.lmplusmiles;
-		awards.push(...getNewLifetimeAward(before, after));
-		}
+		awards.push(...getNewLifetimeAward(x.lm, x.lmplusmiles));
 
 		// Event-based awards
 		const m = Number(x.laps);
-		if (x.class === "Marathon" && m >= 26) awards.push("Marathon Coin");
-		else if (x.class === "50K" && m >= 31) awards.push("50K Coin");
-		else if (x.class === "Quadzilla" && m >= 104) awards.push("Quadzilla Coin");
+		if (x.class === "Marathon" && m >= 27) awards.push("Marathon Coin");
+		else if (x.class === "50K" && m >= 32) awards.push("50K Coin");
+		else if (x.class === "Quadzilla" && m >= 108) awards.push("Quadzilla Coin");
 
 		if (m >= 505) awards.push("505 Belt Buckle");
 		else if (m >= 404) awards.push("404 Belt Buckle");
