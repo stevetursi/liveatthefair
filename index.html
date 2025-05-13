@@ -282,7 +282,7 @@ const updateSort = s => {
 			break;
 		case 'score':
 			Array.from(document.querySelectorAll(".score")).forEach(x => x.classList.add("selected"))
-			sortFunction = (a,b) => b.laps - a.laps
+			sortFunction = (a,b) => (b.totallaps || b.laps) - (a.totallaps || a.laps)
 			break;
 		case 'lifetime':
 			Array.from(document.querySelectorAll(".lifetime")).forEach(x => x.classList.add("selected"))
