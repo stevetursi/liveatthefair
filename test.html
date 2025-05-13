@@ -9,7 +9,7 @@
 	const raceStart = new Date('Mon May 12 2025 09:00:00 GMT-0400');
 	const version = "__VERSION__";
 	const lifeTimeEnabled = true;
-	const displayId = true;
+	const displayId = false;
 
 	const yellowIds = {1001:true,1004:true,1011:true,1016:true,1020:true,1124:true,1108:true,1105:true,1216:true,1696:true,2197:true}
 
@@ -305,20 +305,22 @@ const everyone = () => {
 
 		const combinedData = data.reduce((acc, cur) => {
 			const id = cur.runnerid;
-			const laps = parseInt(cur.laps || "0", 10);
 
 			if (!acc[id]) {
 				acc[id] = { ...cur };
 			} else {
-				const _totallaps = acc[id].totallaps += laps;
+				const oldlaps = parseInt(
+					acc[id].totallaps !== undefined ? acc[id].totallaps : acc[id].laps || "0",
+					10
+				);
+				const laps = parseInt(cur.laps || "0", 10);
+				const _totallaps = oldlaps + laps
 
 				// Replace if this entry has a longer total time
 				if (cur.totaltime > acc[id].totaltime) {
-					acc[id] = { ...cur, totallaps: _totallaps, class: "multiple races" };
-				} else {
-					acc[id].totallaps = _totallaps
-				}
-
+					acc[id] = { ...cur };
+				} 
+				acc[id].totallaps = _totallaps
 				acc[id].class = "multiple races";
 			}
 
