@@ -428,7 +428,7 @@ const buildChart = (myJson, displayClass) => {
 		x.totaltimeofday = lastTimeOfDay;
 		x.timeSinceStart = timeSinceStart(x.averagetime, x.laps)
 		x.lm = lifetime.m[x.runnerid] || 0
-		x.miles = Number(x.totallaps)
+		x.miles = Number(x.totallaps || x.laps)
 		x.lmplusmiles = x.lm+x.miles
 		return x
 	})
