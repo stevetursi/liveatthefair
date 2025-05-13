@@ -9,6 +9,7 @@
 	const raceStart = new Date('Mon May 12 2025 09:00:00 GMT-0400');
 	const version = "__VERSION__";
 	const lifeTimeEnabled = true;
+	const displayId = false;
 
 	const yellowIds = {1001:true,1004:true,1011:true,1016:true,1020:true,1124:true,1108:true,1105:true,1216:true,1696:true,2197:true}
 
@@ -301,8 +302,34 @@ const everyone = () => {
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".everyone")).forEach(x => x.classList.add("selected"))
 	displayFunction = (htmlElement, data) => {
+
+		const combinedData = data.reduce((acc, cur) => {
+			const id = cur.runnerid;
+
+			if (!acc[id]) {
+				acc[id] = { ...cur };
+			} else {
+				const oldlaps = parseInt(
+					acc[id].totallaps !== undefined ? acc[id].totallaps : acc[id].laps || "0",
+					10
+				);
+				const laps = parseInt(cur.laps || "0", 10);
+				const _totallaps = oldlaps + laps
+
+				// Replace if this entry has a longer total time
+				if (cur.totaltime > acc[id].totaltime) {
+					acc[id] = { ...cur };
+				} 
+				acc[id].totallaps = _totallaps
+				acc[id].class = "multiple races";
+			}
+
+			return acc;
+		}, {});
+
+
 		htmlElement.replaceChildren(element("h1", "Race Results: Everyone"))
-		htmlElement.append(buildChart(data, true))
+		htmlElement.append(buildChart(Object.values(combinedData), true))
 	}
 }
 
@@ -382,10 +409,12 @@ const buildChart = (myJson, displayClass) => {
 	const table = document.createElement("table")
 	const head = document.createElement("tr");
 
+	if (displayId) head.appendChild(element("th", "id"))
 	if (displayClass) head.appendChild(element("th", "class"))
 	head.appendChild(element("th", "Runner"))
 	head.appendChild(element("th", "From", true))
 	head.appendChild(element("th", "Miles"))
+	head.appendChild(element("th", "Combined"))
 	if (lifeTimeEnabled) {head.appendChild(element("th", "Lifetime", true))}
 	head.appendChild(element("th", "Total Time"))
 	head.appendChild(element("th", "Average Mile", true))
@@ -399,7 +428,7 @@ const buildChart = (myJson, displayClass) => {
 		x.totaltimeofday = lastTimeOfDay;
 		x.timeSinceStart = timeSinceStart(x.averagetime, x.laps)
 		x.lm = lifetime.m[x.runnerid] || 0
-		x.miles = Number(x.laps)
+		x.miles = Number(x.totallaps || x.laps)
 		x.lmplusmiles = x.lm+x.miles
 		return x
 	})
@@ -407,6 +436,7 @@ const buildChart = (myJson, displayClass) => {
 	.forEach( x => {
 
 		const row = document.createElement("tr")
+		if (displayId) row.appendChild(element("td", x.runnerid))
 		if (displayClass) row.appendChild(element("td", x.class))
 		if (yellowIds[x.runnerid]) row.classList.add("yellow")
 		const name = element("td", x.fullname)
@@ -414,6 +444,7 @@ const buildChart = (myJson, displayClass) => {
 		row.appendChild(name)
 		row.appendChild(element("td", x.city + " " + x.state, true))
 		row.appendChild(element("td", x.laps))
+		row.appendChild(element("td", x.totallaps || ""))
 		if (lifeTimeEnabled) { row.appendChild(element("td", (x.lmplusmiles || 0).toFixed(1), true)) }
 		row.appendChild(element("td", timeFormatted(x.timeSinceStart)))
 		row.appendChild(element("td", x.averagetime, true))
