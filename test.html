@@ -262,8 +262,8 @@ const getNewLifetimeAward = (before, after) => {
     { miles: 1500, label: "1500 Mile Lifetime Brick" },
     { miles: 2000, label: "2000 Mile Lifetime Stained Glass" },
     { miles: 2500, label: "2500 Mile Lifetime Clock" },
-    { miles: 2500, label: "3000 Mile Lifetime Stained Glass" },
-    { miles: 2500, label: "3500 Mile Lifetime Stained Glass" },
+    { miles: 3000, label: "3000 Mile Lifetime Stained Glass" },
+    { miles: 3500, label: "3500 Mile Lifetime Stained Glass" },
     { miles: 4000, label: "4000 Mile Lifetime Stained Glass" }
   ];
 
@@ -282,7 +282,7 @@ const updateSort = s => {
 			break;
 		case 'score':
 			Array.from(document.querySelectorAll(".score")).forEach(x => x.classList.add("selected"))
-			sortFunction = (a,b) => b.laps - a.laps
+			sortFunction = (a,b) => (b.totallaps || b.laps) - (a.totallaps || a.laps)
 			break;
 		case 'lifetime':
 			Array.from(document.querySelectorAll(".lifetime")).forEach(x => x.classList.add("selected"))
@@ -352,13 +352,7 @@ const specificRunner = (r) => {
 
 	displayFunction = (htmlElement, data) => {
 
-		const runners = data.filter(x => true 
-			&& x.firstname == r.firstname 
-			&& x.lastname == r.lastname
-			&& x.age == r.age
-			&& x.city == r.city 
-			&& x.state == r.geostate			
-		)
+		const runners = data.filter(x.runnerid == r.runnerid)
 		
 		const t = element("h1", "Individual Runner Results")
 		t.classList.add("supersize")
@@ -399,11 +393,7 @@ const buildRunner = (runner) => {
 const buildChart = (myJson, displayClass) => {
 
 	const rawRunnerToUriRunner = (runner) => encodeURIComponent(JSON.stringify({	
-		"lastname": runner.lastname,
-		"firstname": runner.firstname,
-		"age": runner.age,
-		"city": runner.city,
-		"geostate": runner.state || runner.geostate || "",
+		"runnerid": runner.runnerid
 	}))
 
 	const table = document.createElement("table")
