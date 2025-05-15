@@ -14,7 +14,7 @@
 	const yellowIds = {1001:true,1004:true,1011:true,1016:true,1020:true,1124:true,1108:true,1105:true,1216:true,1696:true,2197:true}
 
 	// Global mutable state: displayFunction && sortFunction
-	let displayFunction = () => {}
+	let displayFunction = async () => {}
 	let sortFunction = () => {}
 
 	// Management of above
@@ -301,7 +301,7 @@ const everyone = () => {
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".everyone")).forEach(x => x.classList.add("selected"))
-	displayFunction = (htmlElement, data) => {
+	displayFunction = async (htmlElement, data) => {
 
 		const combinedData = data.reduce((acc, cur) => {
 			const id = cur.runnerid;
@@ -338,7 +338,7 @@ const specificRace = (raceId) => {
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".race" + raceId)).forEach(x => x.classList.add("selected"))
-	displayFunction = (htmlElement, data) => {
+	displayFunction = async (htmlElement, data) => {
 		htmlElement.replaceChildren(element("h1", "Race Results: " + raceId))
 		htmlElement.append(buildChart( data.filter(x => x.class == raceId )))
 	}
@@ -381,7 +381,7 @@ const specificRunner = (r) => {
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".sortButton")).forEach(x => x.classList.remove("selected"))
 
-	displayFunction = (htmlElement, data) => {
+	displayFunction = async (htmlElement, data) => {
 
 		const runners = data.filter(x => x.runnerid == r.runnerid)
 		
