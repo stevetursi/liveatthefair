@@ -23,7 +23,7 @@
 	// Lifetime miles, loaded once at startup
 	let lifetime = {}
 
-	const updateMutableState = (s, nopush) => {
+	const updateMutableState = async (s, nopush) => {
 		if (state != s) {
 			state = s;
 
@@ -375,7 +375,7 @@ const renderSplitsTable = (splits) => {
 };
 
 
-const specificRunner = (r) => {
+const specificRunner = async (r) => {
 	document.getElementById("sortOptions").classList.add("no-show")
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
@@ -390,7 +390,7 @@ const specificRunner = (r) => {
 
 		htmlElement.replaceChildren(t)
 
-		runners.forEach(x => {
+		for (const x of runners) {
 			htmlElement.append(element("hr", ""))
 
 			const r1 = element("h1", `${x.fullname} from ${x.city} ${x.state} (${x.class})`)
@@ -405,7 +405,7 @@ const specificRunner = (r) => {
 			// 🆕 Load and show splits
 			const splits = await fetchSplits(x.regnumber);
 			htmlElement.append(renderSplitsTable(splits));			
-		})
+		}
 	}
 }
 
