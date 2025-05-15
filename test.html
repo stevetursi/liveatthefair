@@ -352,7 +352,7 @@ const specificRunner = (r) => {
 
 	displayFunction = (htmlElement, data) => {
 
-		const runners = data.filter(x.runnerid == r.runnerid)
+		const runners = data.filter(x => x.runnerid == r.runnerid)
 		
 		const t = element("h1", "Individual Runner Results")
 		t.classList.add("supersize")
