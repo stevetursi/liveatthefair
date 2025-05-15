@@ -364,7 +364,7 @@ const renderSplitsTable = (splits) => {
 	header.appendChild(element("th", "Total Time"));
 	table.appendChild(header);
 
-	splits.forEach(split => {
+	splits.splits.forEach(split => {
 		const row = document.createElement("tr");
 		row.appendChild(element("td", split.mile));
 		row.appendChild(element("td", split.totaltime));
