@@ -14,7 +14,7 @@
 	const yellowIds = {1001:true,1004:true,1011:true,1016:true,1020:true,1124:true,1108:true,1105:true,1216:true,1696:true,2197:true}
 
 	// Global mutable state: displayFunction && sortFunction
-	let displayFunction = () => {}
+	let displayFunction = async () => {}
 	let sortFunction = () => {}
 
 	// Management of above
@@ -23,7 +23,7 @@
 	// Lifetime miles, loaded once at startup
 	let lifetime = {}
 
-	const updateMutableState = (s, nopush) => {
+	const updateMutableState = async (s, nopush) => {
 		if (state != s) {
 			state = s;
 
@@ -301,7 +301,7 @@ const everyone = () => {
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".everyone")).forEach(x => x.classList.add("selected"))
-	displayFunction = (htmlElement, data) => {
+	displayFunction = async (htmlElement, data) => {
 
 		const combinedData = data.reduce((acc, cur) => {
 			const id = cur.runnerid;
@@ -338,34 +338,59 @@ const specificRace = (raceId) => {
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".race" + raceId)).forEach(x => x.classList.add("selected"))
-	displayFunction = (htmlElement, data) => {
+	displayFunction = async (htmlElement, data) => {
 		htmlElement.replaceChildren(element("h1", "Race Results: " + raceId))
 		htmlElement.append(buildChart( data.filter(x => x.class == raceId )))
 	}
 }
 
-const specificRunner = (r) => {
+const fetchSplits = async (regnumber) => {
+	try {
+		const response = await fetch(`/splits/${regnumber}`);
+		if (!response.ok) throw new Error("Failed to fetch splits");
+		return await response.json(); // array of { mile, totaltime }
+	} catch (e) {
+		console.error(`Error fetching splits for ${regnumber}:`, e);
+		return null;
+	}
+};
+
+const renderSplitsTable = (splits) => {
+	if (!splits || !splits.splits || !splits.splits.length) return element("div", "No splits available.");
+
+	const table = document.createElement("table");
+	const header = document.createElement("tr");
+	header.appendChild(element("th", "Mile"));
+	header.appendChild(element("th", "Total Time"));
+	table.appendChild(header);
+
+	splits.splits.forEach(split => {
+		const row = document.createElement("tr");
+		row.appendChild(element("td", split.mile));
+		row.appendChild(element("td", split.totaltime));
+		table.appendChild(row);
+	});
+
+	return table;
+};
+
+
+const specificRunner = async (r) => {
 	document.getElementById("sortOptions").classList.add("no-show")
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".sortButton")).forEach(x => x.classList.remove("selected"))
 
-	displayFunction = (htmlElement, data) => {
+	displayFunction = async (htmlElement, data) => {
 
-		const runners = data.filter(x => true 
-			&& x.firstname == r.firstname 
-			&& x.lastname == r.lastname
-			&& x.age == r.age
-			&& x.city == r.city 
-			&& x.state == r.geostate			
-		)
+		const runners = data.filter(x => x.runnerid == r.runnerid)
 		
 		const t = element("h1", "Individual Runner Results")
 		t.classList.add("supersize")
 
 		htmlElement.replaceChildren(t)
 
-		runners.forEach(x => {
+		for (const x of runners) {
 			htmlElement.append(element("hr", ""))
 
 			const r1 = element("h1", `${x.fullname} from ${x.city} ${x.state} (${x.class})`)
@@ -376,7 +401,11 @@ const specificRunner = (r) => {
 			Array(r1,r2,r3,r4).forEach(x => htmlElement.append(x))
 
 			htmlElement.append(buildRunner(x))
-		})
+
+			// 🆕 Load and show splits
+			const splits = await fetchSplits(x.regnumber);
+			htmlElement.append(renderSplitsTable(splits));			
+		}
 	}
 }
 
@@ -399,11 +428,7 @@ const buildRunner = (runner) => {
 const buildChart = (myJson, displayClass) => {
 
 	const rawRunnerToUriRunner = (runner) => encodeURIComponent(JSON.stringify({	
-		"lastname": runner.lastname,
-		"firstname": runner.firstname,
-		"age": runner.age,
-		"city": runner.city,
-		"geostate": runner.state || runner.geostate || "",
+		"runnerid": runner.runnerid
 	}))
 
 	const table = document.createElement("table")
@@ -482,14 +507,12 @@ const buildChart = (myJson, displayClass) => {
 	return table;
 }
 
+const render = async (data, domElement, func) => {
+	await func(domElement, data);
 
-const render = (data, domElement, func) => {
-	func(domElement, data)
-
-    // // get most recent time across
-    const timeAcross = data.reduce( (acc, val) => totaltimeofday(val.totaltime) > acc?totaltimeofday(val.totaltime):acc , 0)
-    document.getElementById("lastupdate").replaceChildren( "Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'))
-}
+	const timeAcross = data.reduce((acc, val) => totaltimeofday(val.totaltime) > acc ? totaltimeofday(val.totaltime) : acc, 0);
+	document.getElementById("lastupdate").replaceChildren("Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'));
+};
 
 
 const checkVersion = () => {
