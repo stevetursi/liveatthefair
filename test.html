@@ -344,6 +344,37 @@ const specificRace = (raceId) => {
 	}
 }
 
+const fetchSplits = async (regnumber) => {
+	try {
+		const response = await fetch(`https://s2qyjf4f6k.execute-api.us-east-1.amazonaws.com/splits/${regnumber}`);
+		if (!response.ok) throw new Error("Failed to fetch splits");
+		return await response.json(); // array of { mile, totaltime }
+	} catch (e) {
+		console.error(`Error fetching splits for ${regnumber}:`, e);
+		return null;
+	}
+};
+
+const renderSplitsTable = (splits) => {
+	if (!splits || !splits.length) return element("div", "No splits available.");
+
+	const table = document.createElement("table");
+	const header = document.createElement("tr");
+	header.appendChild(element("th", "Mile"));
+	header.appendChild(element("th", "Total Time"));
+	table.appendChild(header);
+
+	splits.forEach(split => {
+		const row = document.createElement("tr");
+		row.appendChild(element("td", split.mile));
+		row.appendChild(element("td", split.totaltime));
+		table.appendChild(row);
+	});
+
+	return table;
+};
+
+
 const specificRunner = (r) => {
 	document.getElementById("sortOptions").classList.add("no-show")
 
@@ -370,6 +401,10 @@ const specificRunner = (r) => {
 			Array(r1,r2,r3,r4).forEach(x => htmlElement.append(x))
 
 			htmlElement.append(buildRunner(x))
+
+			// 🆕 Load and show splits
+			const splits = await fetchSplits(x.regnumber);
+			htmlElement.append(renderSplitsTable(splits));			
 		})
 	}
 }
@@ -472,14 +507,20 @@ const buildChart = (myJson, displayClass) => {
 	return table;
 }
 
+const render = async (data, domElement, func) => {
+	await func(domElement, data);
 
-const render = (data, domElement, func) => {
-	func(domElement, data)
+	const timeAcross = data.reduce((acc, val) => totaltimeofday(val.totaltime) > acc ? totaltimeofday(val.totaltime) : acc, 0);
+	document.getElementById("lastupdate").replaceChildren("Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'));
+};
 
-    // // get most recent time across
-    const timeAcross = data.reduce( (acc, val) => totaltimeofday(val.totaltime) > acc?totaltimeofday(val.totaltime):acc , 0)
-    document.getElementById("lastupdate").replaceChildren( "Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'))
-}
+// const render = (data, domElement, func) => {
+// 	func(domElement, data)
+
+//     // // get most recent time across
+//     const timeAcross = data.reduce( (acc, val) => totaltimeofday(val.totaltime) > acc?totaltimeofday(val.totaltime):acc , 0)
+//     document.getElementById("lastupdate").replaceChildren( "Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'))
+// }
 
 
 const checkVersion = () => {
