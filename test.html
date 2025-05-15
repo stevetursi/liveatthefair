@@ -346,7 +346,7 @@ const specificRace = (raceId) => {
 
 const fetchSplits = async (regnumber) => {
 	try {
-		const response = await fetch(`https://s2qyjf4f6k.execute-api.us-east-1.amazonaws.com/splits/${regnumber}`);
+		const response = await fetch(`/splits/${regnumber}`);
 		if (!response.ok) throw new Error("Failed to fetch splits");
 		return await response.json(); // array of { mile, totaltime }
 	} catch (e) {
