@@ -356,7 +356,7 @@ const fetchSplits = async (regnumber) => {
 };
 
 const renderSplitsTable = (splits) => {
-	if (!splits || !splits.length) return element("div", "No splits available.");
+	if (!splits || !splits.splits || !splits.splits.length) return element("div", "No splits available.");
 
 	const table = document.createElement("table");
 	const header = document.createElement("tr");
