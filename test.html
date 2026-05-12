@@ -419,10 +419,12 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 			? new Date(splitsData.startTime).getTime()
 			: raceStart.getTime()
 
-		const points = splitsData.splits.map(s => ({
-			x: (startMillis + timeToMillis(s.totaltime) - raceStart.getTime()) / 3600000,
-			y: s.mile
-		}))
+		const points = splitsData.splits
+			.map(s => ({
+				x: (startMillis + timeToMillis(s.totaltime) - raceStart.getTime()) / 3600000,
+				y: s.mile
+			}))
+			.filter(p => p.x >= 0)
 
 		const isCurrent = currentRegnumber && regnumber === currentRegnumber
 		const dataset = {
@@ -463,7 +465,7 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 				}
 			},
 			scales: {
-				x: { type: 'linear', title: { display: true, text: 'Hours' } },
+				x: { type: 'linear', min: 0, title: { display: true, text: 'Hours' } },
 				y: { title: { display: true, text: 'Miles' }, beginAtZero: true }
 			}
 		}
