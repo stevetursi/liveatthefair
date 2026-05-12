@@ -409,13 +409,7 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	const canvas = document.createElement("canvas")
 	container.appendChild(canvas)
 
-	// In race view (no currentRegnumber), cap to top 20 by miles so the chart stays readable
-	let entries = Object.entries(splitsMap).filter(([, s]) => s?.splits?.length)
-	if (!currentRegnumber) {
-		entries = entries
-			.sort((a, b) => (b[1].splits.at(-1)?.mile || 0) - (a[1].splits.at(-1)?.mile || 0))
-			.slice(0, 20)
-	}
+	const entries = Object.entries(splitsMap).filter(([, s]) => s?.splits?.length)
 
 	const otherDatasets = []
 	let currentDataset = null
