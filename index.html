@@ -324,7 +324,7 @@ const everyone = () => {
 	displayFunction = async (htmlElement, data) => {
 
 		const combinedData = data.reduce((acc, cur) => {
-			const id = cur.runnerid;
+			const id = cur.runnerid || cur.regnumber;
 
 			if (!acc[id]) {
 				acc[id] = { ...cur };
