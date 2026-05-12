@@ -428,9 +428,17 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 
 	for (const [regnumber, splitsData] of entries) {
 		const runnerLive = lastData?.find(r => r.regnumber === regnumber)
-		const personalStartOffsetMillis = runnerLive
-			? (Date.now() - raceStart.getTime() - timeToMillis(runnerLive.totaltime))
-			: (splitsData.startTime ? new Date(splitsData.startTime).getTime() - raceStart.getTime() : 0)
+		let personalStartOffsetMillis
+		if (runnerLive) {
+			const totalMillis = timeToMillis(runnerLive.totaltime)
+			const avgMillis = timeToMillis(runnerLive.averagetime)
+			const laps = parseInt(runnerLive.laps)
+			personalStartOffsetMillis = totalMillis - avgMillis * laps
+		} else {
+			personalStartOffsetMillis = splitsData.startTime
+				? new Date(splitsData.startTime).getTime() - raceStart.getTime()
+				: 0
+		}
 
 		const points = splitsData.splits
 			.map(s => ({
