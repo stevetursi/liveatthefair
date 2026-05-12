@@ -356,34 +356,65 @@ const specificRace = (raceId) => {
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".race" + raceId)).forEach(x => x.classList.add("selected"))
 	displayFunction = async (htmlElement, data) => {
+		const classRunners = data.filter(x => x.class == raceId)
 		htmlElement.replaceChildren(element("h1", "Race Results: " + raceId))
-		htmlElement.append(buildChart( data.filter(x => x.class == raceId )))
+
+		const classData = await fetchClassSplits(raceId) || []
+		const splitsMap = Object.fromEntries(classData.map(r => [r.regnumber, r]))
+		htmlElement.append(renderSplitsChart(null, splitsMap))
+
+		htmlElement.append(buildChart(classRunners))
 	}
 }
 
+const splitsCache = {}
+const SPLITS_TTL = 5 * 60 * 1000
+
 const fetchSplits = async (regnumber) => {
+	const cached = splitsCache[regnumber]
+	if (cached && Date.now() - cached.ts < SPLITS_TTL) return cached.data
 	try {
 		const response = await fetch(`/splits/${regnumber}`);
 		if (!response.ok) throw new Error("Failed to fetch splits");
-		return await response.json(); // array of { mile, totaltime }
+		const data = await response.json();
+		splitsCache[regnumber] = { data, ts: Date.now() }
+		return data;
 	} catch (e) {
 		console.error(`Error fetching splits for ${regnumber}:`, e);
 		return null;
 	}
 };
 
+const fetchClassSplits = async (className) => {
+	const key = `class:${className}`
+	const cached = splitsCache[key]
+	if (cached && Date.now() - cached.ts < SPLITS_TTL) return cached.data
+	try {
+		const response = await fetch(`/splits/class/${encodeURIComponent(className)}`);
+		if (!response.ok) throw new Error("Failed to fetch class splits");
+		const data = await response.json();
+		splitsCache[key] = { data, ts: Date.now() }
+		data.forEach(r => { splitsCache[r.regnumber] = { data: r, ts: Date.now() } })
+		return data;
+	} catch (e) {
+		console.error(`Error fetching class splits for ${className}:`, e);
+		return null;
+	}
+};
+
 const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	const container = document.createElement("div")
+	container.classList.add("desktop-only")
 	container.style.cssText = "max-width: 800px; margin: 10px 0;"
 	const canvas = document.createElement("canvas")
 	container.appendChild(canvas)
 
+	const entries = Object.entries(splitsMap).filter(([, s]) => s?.splits?.length)
+
 	const otherDatasets = []
 	let currentDataset = null
 
-	for (const [regnumber, splitsData] of Object.entries(splitsMap)) {
-		if (!splitsData?.splits?.length) continue
-
+	for (const [regnumber, splitsData] of entries) {
 		const startMillis = splitsData.startTime
 			? new Date(splitsData.startTime).getTime()
 			: raceStart.getTime()
@@ -393,13 +424,14 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 			y: s.mile
 		}))
 
-		const isCurrent = regnumber === currentRegnumber
+		const isCurrent = currentRegnumber && regnumber === currentRegnumber
 		const dataset = {
 			label: splitsData.fullname || regnumber,
 			data: points,
-			borderColor: isCurrent ? '#2080c0' : 'rgba(160,160,160,0.4)',
+			borderColor: isCurrent ? '#2080c0' : currentRegnumber ? 'rgba(160,160,160,0.4)' : 'rgba(50,130,200,0.6)',
 			borderWidth: isCurrent ? 2.5 : 1,
-			pointRadius: isCurrent ? 2 : 0,
+			pointRadius: 0,
+			pointHitRadius: 10,
 			fill: false,
 			tension: 0,
 		}
@@ -415,9 +447,20 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 		options: {
 			responsive: true,
 			animation: false,
+			interaction: {
+				mode: 'nearest',
+				intersect: false,
+				axis: 'xy'
+			},
 			plugins: {
 				legend: { display: false },
-				title: { display: true, text: 'Miles vs. Time (hours into race)' }
+				title: { display: true, text: 'Miles vs. Time (hours into race)' },
+				tooltip: {
+					callbacks: {
+						title: items => items[0]?.dataset?.label || '',
+						label: item => `Mile ${item.parsed.y} at ${item.parsed.x.toFixed(1)}h`
+					}
+				}
 			},
 			scales: {
 				x: { type: 'linear', title: { display: true, text: 'Hours' } },
@@ -590,7 +633,9 @@ const buildChart = (myJson, displayClass) => {
 }
 
 const render = async (data, domElement, func) => {
+	const scrollY = window.scrollY
 	await func(domElement, data);
+	window.scrollTo(0, scrollY)
 
 	const timeAcross = data.reduce((acc, val) => totaltimeofday(val.totaltime) > acc ? totaltimeofday(val.totaltime) : acc, 0);
 	document.getElementById("lastupdate").replaceChildren("Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'));
