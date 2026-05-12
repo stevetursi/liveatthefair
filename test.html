@@ -427,17 +427,12 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	let currentDataset = null
 
 	for (const [regnumber, splitsData] of entries) {
-		const runnerLive = lastData?.find(r => r.regnumber === regnumber)
-		const startMillis = runnerLive
-			? Date.now() - timeToMillis(runnerLive.totaltime)
-			: (splitsData.startTime ? new Date(splitsData.startTime).getTime() : raceStart.getTime())
-
 		const points = splitsData.splits
 			.map(s => ({
-				x: (startMillis + timeToMillis(s.totaltime) - raceStart.getTime()) / 3600000,
+				x: timeToMillis(s.totaltime) / 3600000,
 				y: s.mile
 			}))
-			.filter(p => p.x >= 0 && p.x <= nowHours)
+			.filter(p => p.x >= 0 && p.x <= xMax)
 
 		const isCurrent = currentRegnumber && regnumber === currentRegnumber
 		const dataset = {
@@ -469,7 +464,7 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 			},
 			plugins: {
 				legend: { display: false },
-				title: { display: true, text: 'Miles vs. Time (hours into race)' },
+				title: { display: true, text: "Miles vs. Time (hours into runner's race)" },
 				tooltip: {
 					callbacks: {
 						title: items => items[0]?.dataset?.label || '',
