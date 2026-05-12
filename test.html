@@ -404,16 +404,23 @@ const fetchClassSplits = async (className) => {
 
 const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	const container = document.createElement("div")
+	container.classList.add("desktop-only")
 	container.style.cssText = "max-width: 800px; margin: 10px 0;"
 	const canvas = document.createElement("canvas")
 	container.appendChild(canvas)
 
+	// In race view (no currentRegnumber), cap to top 20 by miles so the chart stays readable
+	let entries = Object.entries(splitsMap).filter(([, s]) => s?.splits?.length)
+	if (!currentRegnumber) {
+		entries = entries
+			.sort((a, b) => (b[1].splits.at(-1)?.mile || 0) - (a[1].splits.at(-1)?.mile || 0))
+			.slice(0, 20)
+	}
+
 	const otherDatasets = []
 	let currentDataset = null
 
-	for (const [regnumber, splitsData] of Object.entries(splitsMap)) {
-		if (!splitsData?.splits?.length) continue
-
+	for (const [regnumber, splitsData] of entries) {
 		const startMillis = splitsData.startTime
 			? new Date(splitsData.startTime).getTime()
 			: raceStart.getTime()
@@ -427,9 +434,10 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 		const dataset = {
 			label: splitsData.fullname || regnumber,
 			data: points,
-			borderColor: isCurrent ? '#2080c0' : currentRegnumber ? 'rgba(160,160,160,0.4)' : 'rgba(50,130,200,0.55)',
+			borderColor: isCurrent ? '#2080c0' : currentRegnumber ? 'rgba(160,160,160,0.4)' : 'rgba(50,130,200,0.6)',
 			borderWidth: isCurrent ? 2.5 : 1,
-			pointRadius: isCurrent ? 2 : 0,
+			pointRadius: 0,
+			pointHitRadius: 10,
 			fill: false,
 			tension: 0,
 		}
@@ -445,9 +453,20 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 		options: {
 			responsive: true,
 			animation: false,
+			interaction: {
+				mode: 'nearest',
+				intersect: false,
+				axis: 'xy'
+			},
 			plugins: {
 				legend: { display: false },
-				title: { display: true, text: 'Miles vs. Time (hours into race)' }
+				title: { display: true, text: 'Miles vs. Time (hours into race)' },
+				tooltip: {
+					callbacks: {
+						title: items => items[0]?.dataset?.label || '',
+						label: item => `Mile ${item.parsed.y} at ${item.parsed.x.toFixed(1)}h`
+					}
+				}
 			},
 			scales: {
 				x: { type: 'linear', title: { display: true, text: 'Hours' } },
