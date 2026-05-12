@@ -427,9 +427,14 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	let currentDataset = null
 
 	for (const [regnumber, splitsData] of entries) {
+		const runnerLive = lastData?.find(r => r.regnumber === regnumber)
+		const personalStartOffsetMillis = runnerLive
+			? (Date.now() - raceStart.getTime() - timeToMillis(runnerLive.totaltime))
+			: (splitsData.startTime ? new Date(splitsData.startTime).getTime() - raceStart.getTime() : 0)
+
 		const points = splitsData.splits
 			.map(s => ({
-				x: timeToMillis(s.totaltime) / 3600000,
+				x: (timeToMillis(s.totaltime) - personalStartOffsetMillis) / 3600000,
 				y: s.mile
 			}))
 			.filter(p => p.x >= 0 && p.x <= xMax)
