@@ -524,7 +524,7 @@ const specificRunner = async (r) => {
 
 	displayFunction = async (htmlElement, data) => {
 
-		const runners = data.filter(x => x.runnerid == r.runnerid)
+		const runners = data.filter(x => r.regnumber ? x.regnumber == r.regnumber : (r.runnerid && x.runnerid == r.runnerid))
 		
 		const t = element("h1", "Individual Runner Results")
 		t.classList.add("supersize")
@@ -573,8 +573,9 @@ const buildRunner = (runner) => {
 
 const buildChart = (myJson, displayClass) => {
 
-	const rawRunnerToUriRunner = (runner) => encodeURIComponent(JSON.stringify({	
-		"runnerid": runner.runnerid
+	const rawRunnerToUriRunner = (runner) => encodeURIComponent(JSON.stringify({
+		"runnerid": runner.runnerid,
+		"regnumber": runner.regnumber
 	}))
 
 	const table = document.createElement("table")
