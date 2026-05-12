@@ -590,7 +590,9 @@ const buildChart = (myJson, displayClass) => {
 }
 
 const render = async (data, domElement, func) => {
+	const scrollY = window.scrollY
 	await func(domElement, data);
+	window.scrollTo(0, scrollY)
 
 	const timeAcross = data.reduce((acc, val) => totaltimeofday(val.totaltime) > acc ? totaltimeofday(val.totaltime) : acc, 0);
 	document.getElementById("lastupdate").replaceChildren("Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'));
