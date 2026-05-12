@@ -356,8 +356,16 @@ const specificRace = (raceId) => {
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".race" + raceId)).forEach(x => x.classList.add("selected"))
 	displayFunction = async (htmlElement, data) => {
+		const classRunners = data.filter(x => x.class == raceId)
 		htmlElement.replaceChildren(element("h1", "Race Results: " + raceId))
-		htmlElement.append(buildChart( data.filter(x => x.class == raceId )))
+
+		const splitsResults = await Promise.all(
+			classRunners.map(async r => [r.regnumber, await fetchSplits(r.regnumber)])
+		)
+		const splitsMap = Object.fromEntries(splitsResults.filter(([, s]) => s !== null))
+		htmlElement.append(renderSplitsChart(null, splitsMap))
+
+		htmlElement.append(buildChart(classRunners))
 	}
 }
 
@@ -393,11 +401,11 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 			y: s.mile
 		}))
 
-		const isCurrent = regnumber === currentRegnumber
+		const isCurrent = currentRegnumber && regnumber === currentRegnumber
 		const dataset = {
 			label: splitsData.fullname || regnumber,
 			data: points,
-			borderColor: isCurrent ? '#2080c0' : 'rgba(160,160,160,0.4)',
+			borderColor: isCurrent ? '#2080c0' : currentRegnumber ? 'rgba(160,160,160,0.4)' : 'rgba(50,130,200,0.55)',
 			borderWidth: isCurrent ? 2.5 : 1,
 			pointRadius: isCurrent ? 2 : 0,
 			fill: false,
