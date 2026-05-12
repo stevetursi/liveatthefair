@@ -415,9 +415,10 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	let currentDataset = null
 
 	for (const [regnumber, splitsData] of entries) {
-		const startMillis = splitsData.startTime
-			? new Date(splitsData.startTime).getTime()
-			: raceStart.getTime()
+		const runnerLive = lastData?.find(r => r.regnumber === regnumber)
+		const startMillis = runnerLive
+			? Date.now() - timeToMillis(runnerLive.totaltime)
+			: (splitsData.startTime ? new Date(splitsData.startTime).getTime() : raceStart.getTime())
 
 		const nowHours = (Date.now() - raceStart.getTime()) / 3600000
 		const points = splitsData.splits
