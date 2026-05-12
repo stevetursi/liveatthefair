@@ -359,23 +359,45 @@ const specificRace = (raceId) => {
 		const classRunners = data.filter(x => x.class == raceId)
 		htmlElement.replaceChildren(element("h1", "Race Results: " + raceId))
 
-		const splitsResults = await Promise.all(
-			classRunners.map(async r => [r.regnumber, await fetchSplits(r.regnumber)])
-		)
-		const splitsMap = Object.fromEntries(splitsResults.filter(([, s]) => s !== null))
+		const classData = await fetchClassSplits(raceId) || []
+		const splitsMap = Object.fromEntries(classData.map(r => [r.regnumber, r]))
 		htmlElement.append(renderSplitsChart(null, splitsMap))
 
 		htmlElement.append(buildChart(classRunners))
 	}
 }
 
+const splitsCache = {}
+const SPLITS_TTL = 5 * 60 * 1000
+
 const fetchSplits = async (regnumber) => {
+	const cached = splitsCache[regnumber]
+	if (cached && Date.now() - cached.ts < SPLITS_TTL) return cached.data
 	try {
 		const response = await fetch(`/splits/${regnumber}`);
 		if (!response.ok) throw new Error("Failed to fetch splits");
-		return await response.json(); // array of { mile, totaltime }
+		const data = await response.json();
+		splitsCache[regnumber] = { data, ts: Date.now() }
+		return data;
 	} catch (e) {
 		console.error(`Error fetching splits for ${regnumber}:`, e);
+		return null;
+	}
+};
+
+const fetchClassSplits = async (className) => {
+	const key = `class:${className}`
+	const cached = splitsCache[key]
+	if (cached && Date.now() - cached.ts < SPLITS_TTL) return cached.data
+	try {
+		const response = await fetch(`/splits/class/${encodeURIComponent(className)}`);
+		if (!response.ok) throw new Error("Failed to fetch class splits");
+		const data = await response.json();
+		splitsCache[key] = { data, ts: Date.now() }
+		data.forEach(r => { splitsCache[r.regnumber] = { data: r, ts: Date.now() } })
+		return data;
+	} catch (e) {
+		console.error(`Error fetching class splits for ${className}:`, e);
 		return null;
 	}
 };
