@@ -4,6 +4,7 @@
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-12WTPDTSW8"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 	// Config
 	const raceStart = new Date('Mon May 11 2026 09:00:00 GMT-0400');
@@ -371,6 +372,63 @@ const fetchSplits = async (regnumber) => {
 	}
 };
 
+const renderSplitsChart = (currentRegnumber, splitsMap) => {
+	const container = document.createElement("div")
+	container.style.cssText = "max-width: 800px; margin: 10px 0;"
+	const canvas = document.createElement("canvas")
+	container.appendChild(canvas)
+
+	const otherDatasets = []
+	let currentDataset = null
+
+	for (const [regnumber, splitsData] of Object.entries(splitsMap)) {
+		if (!splitsData?.splits?.length) continue
+
+		const startMillis = splitsData.startTime
+			? new Date(splitsData.startTime).getTime()
+			: raceStart.getTime()
+
+		const points = splitsData.splits.map(s => ({
+			x: (startMillis + timeToMillis(s.totaltime) - raceStart.getTime()) / 3600000,
+			y: s.mile
+		}))
+
+		const isCurrent = regnumber === currentRegnumber
+		const dataset = {
+			label: splitsData.fullname || regnumber,
+			data: points,
+			borderColor: isCurrent ? '#2080c0' : 'rgba(160,160,160,0.4)',
+			borderWidth: isCurrent ? 2.5 : 1,
+			pointRadius: isCurrent ? 2 : 0,
+			fill: false,
+			tension: 0,
+		}
+		if (isCurrent) currentDataset = dataset
+		else otherDatasets.push(dataset)
+	}
+
+	if (!currentDataset && !otherDatasets.length) return element("div", "No chart data available.")
+
+	new Chart(canvas, {
+		type: 'line',
+		data: { datasets: [...otherDatasets, ...(currentDataset ? [currentDataset] : [])] },
+		options: {
+			responsive: true,
+			animation: false,
+			plugins: {
+				legend: { display: false },
+				title: { display: true, text: 'Miles vs. Time (hours into race)' }
+			},
+			scales: {
+				x: { type: 'linear', title: { display: true, text: 'Hours' } },
+				y: { title: { display: true, text: 'Miles' }, beginAtZero: true }
+			}
+		}
+	})
+
+	return container
+}
+
 const renderSplitsTable = (splits) => {
 	if (!splits || !splits.splits || !splits.splits.length) return element("div", "No splits available.");
 
@@ -419,9 +477,14 @@ const specificRunner = async (r) => {
 
 			htmlElement.append(buildRunner(x))
 
-			// 🆕 Load and show splits
-			const splits = await fetchSplits(x.regnumber);
-			htmlElement.append(renderSplitsTable(splits));			
+			const classRunners = data.filter(d => d.class === x.class)
+			const splitsResults = await Promise.all(
+				classRunners.map(async cr => [cr.regnumber, await fetchSplits(cr.regnumber)])
+			)
+			const splitsMap = Object.fromEntries(splitsResults.filter(([, s]) => s !== null))
+
+			htmlElement.append(renderSplitsChart(x.regnumber, splitsMap))
+			htmlElement.append(renderSplitsTable(splitsMap[x.regnumber]))
 		}
 	}
 }
@@ -532,14 +595,6 @@ const render = async (data, domElement, func) => {
 	const timeAcross = data.reduce((acc, val) => totaltimeofday(val.totaltime) > acc ? totaltimeofday(val.totaltime) : acc, 0);
 	document.getElementById("lastupdate").replaceChildren("Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'));
 };
-
-// const render = (data, domElement, func) => {
-// 	func(domElement, data)
-
-//     // // get most recent time across
-//     const timeAcross = data.reduce( (acc, val) => totaltimeofday(val.totaltime) > acc?totaltimeofday(val.totaltime):acc , 0)
-//     document.getElementById("lastupdate").replaceChildren( "Last Update: " + timeAcross.toLocaleDateString("en-US") + " " + timeAcross.toLocaleTimeString('en-US'))
-// }
 
 
 const checkVersion = () => {
