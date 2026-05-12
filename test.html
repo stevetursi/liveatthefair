@@ -219,6 +219,10 @@ const timeSinceStart = (avgTime, laps) => {
 
 const timeToMillis = (aTime) => {
 	const times = aTime.split(":");
+	if (times.length === 4) {
+		// D:HH:MM:SS — timing software uses this format after 24h
+		return ((+times[0]*24*3600 + +times[1]*3600 + +times[2]*60 + parseFloat(times[3])) * 1000)
+	}
 	const hours = times.length > 2 ? times[0] : 0;
 	const mins = times.length > 1 ? times[times.length-2] : 0;
 	const secs = times[times.length-1];
@@ -402,6 +406,11 @@ const fetchClassSplits = async (className) => {
 	}
 };
 
+const getRaceDuration = (className) => {
+	const match = className?.match(/^(\d+)/)
+	return match ? parseInt(match[1]) : null
+}
+
 const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	const container = document.createElement("div")
 	container.classList.add("desktop-only")
@@ -410,6 +419,9 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 	container.appendChild(canvas)
 
 	const entries = Object.entries(splitsMap).filter(([, s]) => s?.splits?.length)
+	const firstClass = Object.values(splitsMap)[0]?.class
+	const nowHours = (Date.now() - raceStart.getTime()) / 3600000
+	const xMax = getRaceDuration(firstClass) || Math.ceil(nowHours)
 
 	const otherDatasets = []
 	let currentDataset = null
@@ -420,7 +432,6 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 			? Date.now() - timeToMillis(runnerLive.totaltime)
 			: (splitsData.startTime ? new Date(splitsData.startTime).getTime() : raceStart.getTime())
 
-		const nowHours = (Date.now() - raceStart.getTime()) / 3600000
 		const points = splitsData.splits
 			.map(s => ({
 				x: (startMillis + timeToMillis(s.totaltime) - raceStart.getTime()) / 3600000,
@@ -467,7 +478,7 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 				}
 			},
 			scales: {
-				x: { type: 'linear', min: 0, max: Math.ceil((Date.now() - raceStart.getTime()) / 3600000), title: { display: true, text: 'Hours' } },
+				x: { type: 'linear', min: 0, max: xMax, title: { display: true, text: 'Hours' } },
 				y: { title: { display: true, text: 'Miles' }, beginAtZero: true }
 			}
 		}
