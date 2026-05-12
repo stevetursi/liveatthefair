@@ -23,6 +23,9 @@
 	// Lifetime miles, loaded once at startup
 	let lifetime = {}
 
+	let currentSearch = ''
+	let lastData = null
+
 	const updateMutableState = async (s, nopush) => {
 		if (state != s) {
 			state = s;
@@ -171,6 +174,9 @@
 	<button class="raceButton race50K" onClick="updateMutableState({...state, r: '50K', p: ''})">50K</button>
 	<button class="raceButton raceMara" onClick="updateMutableState({...state, r: 'Marathon', p: ''})">Marathon</button>
 </div>
+<div id="searchDiv">
+	Search: <input type="text" id="searchInput" placeholder="runner name..." oninput="onSearchInput(this.value)" style="font-size: 1em; padding: 3px;">
+</div>
 <div id="sortOptions">
 	Sort By:
 	<button class="sortButton name" onClick="updateMutableState({...state, s: ''})">Name</button>
@@ -296,9 +302,17 @@ const updateSort = s => {
 	}
 }
 
+const onSearchInput = (val) => {
+	currentSearch = val.toLowerCase().trim()
+	if (lastData) {
+		render(lastData, document.getElementById("resultsDiv"), displayFunction)
+	}
+}
+
 // functions that update the displayFunction
 const everyone = () => {
 	document.getElementById("sortOptions").classList.remove("no-show")
+	document.getElementById("searchDiv").classList.remove("no-show")
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".everyone")).forEach(x => x.classList.add("selected"))
@@ -336,6 +350,7 @@ const everyone = () => {
 
 const specificRace = (raceId) => {
 	document.getElementById("sortOptions").classList.remove("no-show")
+	document.getElementById("searchDiv").classList.remove("no-show")
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".race" + raceId)).forEach(x => x.classList.add("selected"))
@@ -378,6 +393,7 @@ const renderSplitsTable = (splits) => {
 
 const specificRunner = async (r) => {
 	document.getElementById("sortOptions").classList.add("no-show")
+	document.getElementById("searchDiv").classList.add("no-show")
 
 	Array.from(document.querySelectorAll(".raceButton")).forEach(x => x.classList.remove("selected"))
 	Array.from(document.querySelectorAll(".sortButton")).forEach(x => x.classList.remove("selected"))
@@ -449,7 +465,9 @@ const buildChart = (myJson, displayClass) => {
 
 	table.append(head)
 
-	myJson.map(x=> {
+	myJson
+	.filter(x => !currentSearch || (x.fullname || '').toLowerCase().includes(currentSearch))
+	.map(x=> {
 		const lastTimeOfDay = totaltimeofday(x.totaltime);
 		x.totaltimeofday = lastTimeOfDay;
 		x.timeSinceStart = timeSinceStart(x.averagetime, x.laps)
@@ -566,8 +584,9 @@ const loop = () => {
 				const a = lifeTimeEnabled?[n]:{}
 				return {...runner, ...a}	
 			})
+		lastData = r
 		const resultsDiv = document.getElementById("resultsDiv")
-		render(r, resultsDiv, displayFunction)
+		render(lastData, resultsDiv, displayFunction)
 	});
 }
 
