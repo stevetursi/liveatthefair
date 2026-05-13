@@ -492,8 +492,12 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 				title: { display: true, text: "Miles vs. Time (hours into runner's race)" },
 				tooltip: {
 					callbacks: {
-						title: items => items[0]?.dataset?.label || '',
-						label: item => `Mile ${item.parsed.y} at ${item.parsed.x.toFixed(1)}h`
+						title: items => {
+							const names = [...new Set(items.map(i => i.dataset.label))]
+							const { x, y } = items[0].parsed
+							return [...names, `Mile ${y} at ${x.toFixed(1)}h`]
+						},
+						label: () => null
 					}
 				}
 			},
