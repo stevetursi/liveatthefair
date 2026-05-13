@@ -447,6 +447,18 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 			}))
 			.filter(p => p.x >= 0 && p.x <= xMax)
 
+		// Extend flat line to current position (or race end)
+		if (points.length > 0) {
+			const currentNowX = Math.min(
+				(Date.now() - raceStart.getTime() - personalStartOffsetMillis) / 3600000,
+				xMax
+			)
+			const lastPoint = points[points.length - 1]
+			if (currentNowX > lastPoint.x) {
+				points.push({ x: currentNowX, y: runnerLive ? parseInt(runnerLive.laps) : lastPoint.y })
+			}
+		}
+
 		const isCurrent = currentRegnumber && regnumber === currentRegnumber
 		const dataset = {
 			label: splitsData.fullname || regnumber,
