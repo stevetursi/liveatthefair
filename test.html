@@ -493,9 +493,9 @@ const renderSplitsChart = (currentRegnumber, splitsMap) => {
 				tooltip: {
 					callbacks: {
 						title: items => {
-							const names = [...new Set(items.map(i => i.dataset.label))].join(' & ')
+							const names = [...new Set(items.map(i => i.dataset.label))]
 							const { x, y } = items[0].parsed
-							return [names, `Mile ${y} at ${x.toFixed(1)}h`]
+							return [...names, `Mile ${y} at ${x.toFixed(1)}h`]
 						},
 						label: () => null
 					}
